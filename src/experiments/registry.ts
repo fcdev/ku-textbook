@@ -9,4 +9,6 @@ export const experiments: Record<string, ExperimentDef> = {
   "poly-fit": { ...experimentModels["poly-fit"], Component: lazy(() => import("./poly-fit/PolyFit")) },
   "line-fit": { ...experimentModels["line-fit"], Component: lazy(() => import("./line-fit/LineFit")) },
   "descent-1d": { ...experimentModels["descent-1d"], Component: lazy(() => import("./descent-1d/Descent1D")) },
+  "descent-2d": { ...experimentModels["descent-2d"], Component: lazy(() => import("./descent-2d/Descent2D")) },
+  "tiny-net": { ...experimentModels["tiny-net"], Component: lazy(() => import("./tiny-net/TinyNet")) },
 };

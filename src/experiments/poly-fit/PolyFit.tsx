@@ -1,16 +1,17 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { evalPoly } from "@/lib/numeric";
-import { defaultParams, type ExperimentProps, type Params } from "../types";
+import { type ExperimentProps } from "../types";
+import { useExperimentParams } from "../channel";
 import { fnPath, Legend, Plot, Readout, Slider, sx, sy, type Frame } from "../primitives";
 import { LAMBDAS, polyFitModel, solve, truth } from "./model";
 
 const FIT: Frame = { W: 600, H: 340, left: 50, right: 10, top: 10, bottom: 26, x0: -1.05, x1: 1.05, y0: -1.9, y1: 1.9 };
 const SWEEP: Frame = { W: 600, H: 220, left: 60, right: 64, top: 12, bottom: 28, x0: 0, x1: 12, y0: -3, y1: 2 };
 
-export default function PolyFit({ preset, hide = [], onState, readOnly, showSweep }: ExperimentProps) {
+export default function PolyFit({ preset, channel, hide = [], onState, readOnly, showSweep }: ExperimentProps) {
   const p = polyFitModel.presets[preset] ?? polyFitModel.presets.lab;
-  const [params, setParams] = useState<Params>(() => defaultParams(polyFitModel, preset));
+  const [params, setParams] = useExperimentParams(polyFitModel, preset, channel);
   const [seed, setSeed] = useState(p.seed ?? 1);
   const [showTruth, setShowTruth] = useState(preset === "lab");
   const visible = p.visibleControls ?? polyFitModel.params.map((s) => s.key);

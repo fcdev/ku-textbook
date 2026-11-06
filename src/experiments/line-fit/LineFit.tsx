@@ -1,16 +1,17 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 import { formatError } from "@/lib/numeric";
-import { defaultParams, type ExperimentProps, type Params } from "../types";
+import { type ExperimentProps } from "../types";
+import { useExperimentParams } from "../channel";
 import { Btn, Legend, Metric, Plot, Slider, sx, sy, type Frame } from "../primitives";
 import { lineFitModel, solveLine } from "./model";
 
 const F: Frame = { W: 600, H: 340, left: 50, right: 10, top: 10, bottom: 26, x0: -1.1, x1: 1.1, y0: -1.5, y1: 1.5 };
 const snap = (v: number) => Math.round(v / 0.05) * 0.05;
 
-export default function LineFit({ preset, hide = [], onState, readOnly }: ExperimentProps) {
+export default function LineFit({ preset, channel, hide = [], onState, readOnly }: ExperimentProps) {
   const p = lineFitModel.presets[preset] ?? lineFitModel.presets.lab;
-  const [params, setParams] = useState<Params>(() => defaultParams(lineFitModel, preset));
+  const [params, setParams] = useExperimentParams(lineFitModel, preset, channel);
   const [seed, setSeed] = useState(p.seed ?? 1);
   const [showBest, setShowBest] = useState(false);
   const isLab = !p.visibleControls;

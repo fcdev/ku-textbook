@@ -79,8 +79,8 @@ export default function KnowledgeMap({ kus, index }: { kus: KuMeta[]; index: Sea
             const s = nodeState(k.id);
             const p = pos.get(k.id)!;
             const n = stepNo.get(k.id);
-            const fill = s.isTarget ? "var(--color-primary)" : s.inPath ? "var(--color-accent-soft)" : "var(--color-surface)";
-            const stroke = s.isTarget ? "var(--color-primary)" : s.inPath ? "var(--color-line-strong)" : "var(--color-line)";
+            const fill = s.isTarget ? "var(--color-primary)" : s.done ? "var(--color-good-soft)" : s.inPath ? "var(--color-accent-soft)" : "var(--color-surface)";
+            const stroke = s.isTarget ? "var(--color-primary)" : s.done ? "var(--color-good)" : s.inPath ? "var(--color-line-strong)" : "var(--color-line)";
             const ink = s.isTarget ? "var(--color-on-primary)" : s.planned ? "var(--color-muted)" : "var(--color-ink)";
             return (
               <g key={k.id} transform={`translate(${p.x},${p.y})`} opacity={s.dim ? 0.25 : 1} className="cursor-pointer"
@@ -115,7 +115,7 @@ export default function KnowledgeMap({ kus, index }: { kus: KuMeta[]; index: Sea
                   <button key={id} type="button" onClick={() => setTarget(id)} aria-pressed={s.isTarget}
                     className={[
                       "relative min-h-11 rounded-lg border px-3 text-left text-sm",
-                      s.isTarget ? "border-accent bg-primary font-bold text-on-primary" : s.inPath ? "border-line-strong bg-accent-soft" : "border-line bg-surface",
+                      s.isTarget ? "border-accent bg-primary font-bold text-on-primary" : s.done ? "border-good bg-good-soft" : s.inPath ? "border-line-strong bg-accent-soft" : "border-line bg-surface",
                       s.planned && !s.isTarget ? (s.inPath ? "border-dashed text-ink-2" : "border-dashed text-muted") : "",
                       s.dim ? "opacity-30" : "",
                     ].join(" ")}>
@@ -141,7 +141,7 @@ function MapLegend() {
       <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-5 rounded border border-line bg-surface" />{t.legendReady}</span>
       <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-5 rounded border border-dashed border-muted" />{t.legendPlanned}</span>
       <span className="inline-flex items-center gap-1.5"><i className="inline-block h-3 w-5 rounded border-2 border-line-strong bg-accent-soft" />{t.legendPath}</span>
-      <span className="inline-flex items-center gap-1.5"><span className="text-good">✓</span>{t.legendDone}</span>
+      <span className="inline-flex items-center gap-1.5"><i className="inline-grid h-3 w-5 place-items-center rounded border border-good bg-good-soft text-[9px] text-good">✓</i>{t.legendDone}</span>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import path from "node:path";
 import { experimentModels, plannedExperiments } from "@/experiments/models";
 import { buildGraph, GraphError } from "./graph";
 import { ContentError, readKu, type Ku } from "./content";
+import { lintInteractive } from "./interactive";
 
 export interface LintIssue {
   level: "error" | "warn";
@@ -52,6 +53,7 @@ export function lintContent(root: string): { kus: Ku[]; issues: LintIssue[] } {
       if (!em) err(ku.id, `正文引用了不存在的实验「${m[1]}」`);
       else if (m[2] && !em.presets[m[2]]) err(ku.id, `实验「${m[1]}」没有 preset「${m[2]}」`);
     }
+    for (const e of lintInteractive(ku.body, experimentModels)) err(ku.id, e);
     for (const m of ku.body.matchAll(/<Formula>([\s\S]*?)<\/Formula>/g)) {
       if (m[1].includes('"')) err(ku.id, "<Formula> 里不能有英文双引号");
     }

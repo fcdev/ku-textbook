@@ -1,4 +1,5 @@
 import KnowledgeMap from "@/components/KnowledgeMap";
+import { StampShelf } from "@/components/Stamp";
 import { getContent, intuitionText, toMeta } from "@/lib/content";
 import { t } from "@/lib/strings";
 import { buildIndex } from "@/lib/search";
@@ -17,6 +18,7 @@ export default function Home() {
         <p className="text-muted">{t.siteTagline}</p>
       </section>
       <KnowledgeMap kus={metas} index={index} />
+      <StampShelf kus={metas.map((k) => ({ id: k.id, title: k.title, status: k.status }))} />
     </div>
   );
 }

@@ -1,16 +1,18 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatError } from "@/lib/numeric";
-import { defaultParams, type ExperimentProps, type Params } from "../types";
+import { type ExperimentProps } from "../types";
+import { useExperimentParams } from "../channel";
+import { useStill } from "@/lib/still";
 import { Btn, fnPath, Metric, Plot, Slider, sx, sy, type Frame } from "../primitives";
 import { descent1dModel, loss, LRS, MAX_STEPS, solveDescent, W_STAR } from "./model";
 
 const F: Frame = { W: 600, H: 320, left: 50, right: 10, top: 10, bottom: 26, x0: -2.5, x1: 4.5, y0: -0.5, y1: 12.5 };
 const clampW = (w: number) => Math.max(F.x0 - 1, Math.min(F.x1 + 1, w));
 
-export default function Descent1D({ preset, hide = [], onState, readOnly }: ExperimentProps) {
+export default function Descent1D({ preset, channel, hide = [], onState, readOnly }: ExperimentProps) {
   const p = descent1dModel.presets[preset] ?? descent1dModel.presets.lab;
-  const [params, setParams] = useState<Params>(() => defaultParams(descent1dModel, preset));
+  const [params, setParams] = useExperimentParams(descent1dModel, preset, channel);
   const [playing, setPlaying] = useState(false);
   const isLab = !p.visibleControls;
   const visible = p.visibleControls ?? descent1dModel.params.map((s) => s.key);
@@ -21,11 +23,14 @@ export default function Descent1D({ preset, hide = [], onState, readOnly }: Expe
   const set = (k: string, v: number) => setParams((o) => ({ ...o, [k]: v }));
   const stop = metrics.diverged === 1 || steps >= MAX_STEPS;
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const still = useStill();
   useEffect(() => {
     if (!playing) return;
+    // 静止模式：不做逐步动画，直接跳到 60 步后的结果
+    if (still) { setParams((o) => ({ ...o, steps: MAX_STEPS })); setPlaying(false); return; }
     timer.current = setInterval(() => setParams((o) => ({ ...o, steps: Math.min(MAX_STEPS, Number(o.steps) + 1) })), 350);
     return () => { if (timer.current) clearInterval(timer.current); };
-  }, [playing]);
+  }, [playing, still, setParams]);
   useEffect(() => { if (stop && playing) setPlaying(false); }, [stop, playing]);
   useEffect(() => { if (readOnly) setPlaying(false); }, [readOnly]);
 

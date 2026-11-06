@@ -27,7 +27,7 @@ export default function ThemeToggle() {
     }
   };
   return (
-    <button type="button" onClick={() => apply(next[mode])} className="min-h-9 rounded-full border border-line px-3 text-xs text-muted hover:text-ink" aria-label={`主题：${label[mode]}，点击切换`}>
+    <button type="button" onClick={() => apply(next[mode])} className="min-h-9 whitespace-nowrap rounded-full border border-line px-2.5 text-xs text-muted hover:text-ink" aria-label={`主题：${label[mode]}，点击切换`}>
       {label[mode]}
     </button>
   );

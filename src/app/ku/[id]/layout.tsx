@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import KuTabs from "@/components/KuTabs";
+import { KuStamp } from "@/components/Stamp";
 import { getContent, getKu } from "@/lib/content";
 import { t } from "@/lib/strings";
 
@@ -18,7 +19,8 @@ export default async function KuLayout({ children, params }: { children: React.R
   const ready = ku.status !== "planned";
   return (
     <article className="space-y-6">
-      <header className="space-y-3">
+      <header className="relative space-y-3">
+        <KuStamp id={ku.id} title={ku.title} />
         <h1 className="text-3xl font-bold md:text-4xl">{ku.title}</h1>
         {ku.summary && <p className="text-lg text-muted">{ku.summary}</p>}
         <div className="flex flex-wrap items-center gap-2 text-xs">
