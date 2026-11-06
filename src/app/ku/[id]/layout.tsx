@@ -24,13 +24,13 @@ export default async function KuLayout({ children, params }: { children: React.R
         <div className="flex flex-wrap items-center gap-2 text-xs">
           {ku.prerequisites.length > 0 && <span className="text-muted">{t.prerequisites}</span>}
           {ku.prerequisites.map((p) => (
-            <Link key={p} href={`/ku/${p}`} className="rounded-full border border-line bg-surface px-2.5 py-1 text-ink no-underline hover:border-accent">
+            <Link key={p} href={`/ku/${p}`} className="rounded-full border border-line bg-surface px-2.5 py-1 text-ink no-underline hover:border-primary">
               {graph.byId.get(p)!.title}
             </Link>
           ))}
           {Object.entries(ku.links).flatMap(([subject, items]) =>
             items.map((i) => (
-              <span key={`${subject}-${i}`} className="rounded-full bg-accent-soft px-2.5 py-1 text-accent">
+              <span key={`${subject}-${i}`} className="rounded-full bg-surface-2 px-2.5 py-1 text-ink-2">
                 {subject === "math" ? "数学" : subject === "physics" ? "物理" : subject} · {i}
               </span>
             )),

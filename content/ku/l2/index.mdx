@@ -1,10 +1,59 @@
 ---
 id: l2
 title: L2 正则化
+summary: 惩罚过大的参数，让模型别把噪声也背下来。
 prerequisites: [overfit]
 chapter: 9
 experiment: poly-fit
+links:
+  math: [多项式函数, 平方和]
+  physics: [弹簧的弹性势能]
 reading:
   - { title: "Understanding Deep Learning 第 9 章", url: "https://udlbook.github.io/udlbook/" }
-status: planned
+status: published
+authors: [c]
+reviewers: []
+estMinutes: 8
 ---
+
+<Intuition>
+
+## 给模型加一条规矩
+
+上一个知识点里，12 阶多项式在点和点之间疯狂乱跳，把训练数据的噪声也背了下来。要让曲线这样乱跳，多项式的系数必须非常大，正负互相抵消。
+
+**L2 正则化**的想法很朴素：训练时除了要求曲线贴近数据，再加一条规矩，**系数不许太大**。系数越大，罚得越多。罚的力度由一个数 $\lambda$ 控制。
+
+<Experiment id="poly-fit" preset="l2-article" />
+
+阶数固定在 12，只拖动 λ：
+
+<Stage label="λ 关">曲线穿过每个蓝点，中间乱跳，测试误差很大。过拟合。</Stage>
+
+<Stage label="λ 适中">曲线变得平滑，不再追每一个点，测试误差明显下降。</Stage>
+
+<Stage label="λ 很大">罚得太狠，曲线被压成一条接近水平的线，又变成了欠拟合。</Stage>
+
+<Callout>正则化没有减少参数的个数，模型还是 12 阶。它只是不让参数变得太大，模型自然就“简单”了。</Callout>
+
+</Intuition>
+
+<Theory>
+
+## 加了惩罚项的损失
+
+L2 正则化在均方误差后面加上系数平方和，再乘以 $\lambda$：
+
+<Formula>L(w) = \frac{1}{N}\sum_{i=1}^{N} \bigl(f(x_i) - y_i\bigr)^2 + \lambda \sum_{j=1}^{d} w_j^2</Formula>
+
+常数项 $w_0$ 一般不罚，因为它只是把曲线整体上下平移，和“弯不弯”无关。这也是 λ 很大时曲线变成水平线的原因：只剩 $w_0$ 不受罚。
+
+<Experiment id="poly-fit" preset="l2-article" sweep />
+
+对多项式回归，加了惩罚项后的最优系数仍然有公式（$X$ 是每个点的 $1, x, x^2, \dots$ 排成的矩阵，$I'$ 是左上角为 0 的单位矩阵）：
+
+<Formula>w^* = \bigl(X^\top X + \lambda N I'\bigr)^{-1} X^\top y</Formula>
+
+加上 $\lambda N I'$ 还有一个好处：原来的 $X^\top X$ 在高阶时几乎不可逆，算出来的系数很不稳定；加上它之后矩阵变得“好算”了。神经网络里，L2 正则化通常叫做**权重衰减**（weight decay）。
+
+</Theory>

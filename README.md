@@ -20,12 +20,12 @@ pnpm dev            # http://localhost:3000
 | `pnpm test` | Vitest 单测（graph / quiz / numeric / poly-fit / ku-lint） |
 | `pnpm build` | 先跑 ku:lint，再静态生成全部页面 |
 
-## 目前做到哪（第 1 周）
+## 目前做到哪
 
-- 22 个 KU 全部上地图，`overfit`（过拟合与欠拟合）是完整的：互动文章（直觉 / 原理）、4 道闯关题、实验沙盒。
-- 页面：`/` 知识地图 + 搜索 + 学习路径，`/ku/overfit`，`/ku/overfit/practice`，`/ku/overfit/lab`。
+- 22 个 KU 全部上地图，6 个完整：一元线性回归、损失函数、梯度下降、学习率、过拟合与欠拟合、L2 正则化。每个都有互动文章（直觉 / 原理）、闯关和实验沙盒。
+- 三个实验：`line-fit`、`descent-1d`、`poly-fit`。
+- 页面：`/` 知识地图 + 搜索，`/ku/<id>`、`/ku/<id>/practice`、`/ku/<id>/lab`，`/path/<id>` 学习路径。
 - 学生进度存在 localStorage，读写失败时静默降级。
-- 还没做：教师端、数据库、教案生成、其余 5 个完整 KU 和两个实验（见 SPEC §10 第 2–3 周）。
 
 ## 写一个 KU
 

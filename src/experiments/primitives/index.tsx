@@ -117,7 +117,7 @@ export function Legend({ items }: { items: ("train" | "test" | "model" | "truth"
   const mark = {
     train: <i className="inline-block size-2.5 rounded-full bg-train" />,
     test: <i className="inline-block size-2.5 rounded-full border-2 border-test" />,
-    model: <i className="inline-block h-[3px] w-4 rounded bg-accent" />,
+    model: <i className="inline-block h-[3px] w-4 rounded bg-model" />,
     truth: <i className="inline-block w-4 border-t-2 border-dashed border-truth" />,
   };
   return (
@@ -126,5 +126,25 @@ export function Legend({ items }: { items: ("train" | "test" | "model" | "truth"
         <span key={k} className="inline-flex items-center gap-1.5">{mark[k]}{text[k]}</span>
       ))}
     </div>
+  );
+}
+
+/* ---------- 通用读数 ---------- */
+export function Metric({ label, value, tone = "ink", mark }: { label: string; value: string; tone?: "ink" | "train" | "test" | "model" | "good" | "bad"; mark?: ReactNode }) {
+  const color = { ink: "text-ink", train: "text-train", test: "text-test", model: "text-ink", good: "text-good", bad: "text-bad" }[tone];
+  return (
+    <span className="inline-flex items-center gap-2">
+      {mark}
+      {label} <b className={`mono inline-block min-w-[5ch] ${color}`}>{value}</b>
+    </span>
+  );
+}
+
+export function Btn({ children, onClick, pressed, disabled, primary }: { children: ReactNode; onClick: () => void; pressed?: boolean; disabled?: boolean; primary?: boolean }) {
+  return (
+    <button type="button" onClick={onClick} aria-pressed={pressed} disabled={disabled}
+      className={`min-h-11 rounded-lg border px-4 text-sm disabled:opacity-40 ${primary ? "border-primary bg-primary font-bold text-on-primary" : "border-line bg-surface hover:border-primary"}`}>
+      {children}
+    </button>
   );
 }

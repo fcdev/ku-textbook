@@ -1,0 +1,28 @@
+- id: q1
+  type: experiment-target
+  prompt: 选一个学习率，让小球在 10 步以内到达谷底。可以点“自动播放”验证。
+  experiment: { id: descent-1d, preset: lr-practice }
+  check: { metric: stepsTo, op: "between", value: [1, 10] }
+  hint: 0.01 太慢了。往大调，但别超过 1。
+  explain: 学习率合适时，几步就能到谷底。
+- id: q2
+  type: choice
+  prompt: 学习率设成 1.1，小球会怎样？
+  options: [慢慢靠近谷底, 来回跳并且越跳越远, 一步到位]
+  answer: 1
+  hint: 在实验里把学习率拉到最大，点自动播放看看。
+  explain: 每一步都跳过谷底，而且跳得比上一步更远，这就是发散。
+- id: q3
+  type: choice
+  prompt: 学习率太小，最主要的问题是……
+  options: [训练太慢, 一定会发散, 损失会变大]
+  answer: 0
+  hint: 0.01 的时候小球发生了什么？
+  explain: 方向是对的，只是步子太小，要走很多步才能到。
+- id: q4
+  type: choice
+  prompt: 数学题：数列 aₙ = 2.5 × (−0.8)ⁿ 会怎样？
+  options: [正负交替，绝对值越来越小, 一直变大, 一直不变]
+  answer: 0
+  hint: 公比是 −0.8，绝对值小于 1。
+  explain: 这正是学习率 0.9 时小球离谷底的距离：两边来回跳，但越来越近。

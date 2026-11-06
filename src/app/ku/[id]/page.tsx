@@ -46,7 +46,7 @@ export default async function KuArticle({ params }: { params: Promise<{ id: stri
       <LevelSwitch hasTheory={/<Theory>/.test(ku.body)}>{content}</LevelSwitch>
       <footer className="space-y-4 border-t border-line pt-6">
         {ku.quiz.length > 0 && (
-          <Link href={`/ku/${ku.id}/practice`} className="inline-flex min-h-12 items-center rounded-xl bg-accent px-6 font-bold text-surface no-underline">
+          <Link href={`/ku/${ku.id}/practice`} className="inline-flex min-h-12 items-center rounded-xl bg-primary px-6 font-bold text-on-primary no-underline">
             {t.goPractice} · {ku.quiz.length} 题 →
           </Link>
         )}

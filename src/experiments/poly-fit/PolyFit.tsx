@@ -82,10 +82,10 @@ export default function PolyFit({ preset, hide = [], onState, readOnly, showSwee
 
       {isLab && (
         <div className="flex flex-wrap gap-2">
-          <button type="button" className="min-h-11 rounded-lg border border-line bg-surface px-4 text-sm hover:border-accent" onClick={() => setSeed((s) => s + 1)} disabled={readOnly}>
+          <button type="button" className="min-h-11 rounded-lg border border-line bg-surface px-4 text-sm hover:border-primary" onClick={() => setSeed((s) => s + 1)} disabled={readOnly}>
             重新采样数据
           </button>
-          <button type="button" aria-pressed={showTruth} className="min-h-11 rounded-lg border border-line bg-surface px-4 text-sm hover:border-accent" onClick={() => setShowTruth((v) => !v)}>
+          <button type="button" aria-pressed={showTruth} className="min-h-11 rounded-lg border border-line bg-surface px-4 text-sm hover:border-primary" onClick={() => setShowTruth((v) => !v)}>
             {showTruth ? "隐藏真实规律" : "显示真实规律"}
           </button>
         </div>

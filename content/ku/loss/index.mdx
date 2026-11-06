@@ -1,10 +1,59 @@
 ---
 id: loss
 title: 损失函数
+summary: 给模型的表现打一个分，分数越低越好。
 prerequisites: [linreg]
 chapter: 2
 experiment: line-fit
+links:
+  math: [平方, 平均数, 函数的最小值]
+  physics: [误差分析]
 reading:
   - { title: "Understanding Deep Learning 第 2 章", url: "https://udlbook.github.io/udlbook/" }
-status: planned
+status: published
+authors: [c]
+reviewers: []
+estMinutes: 7
 ---
+
+<Intuition>
+
+## 给直线打分
+
+两条直线，哪条更好？凭眼睛看，常常说不清。我们需要一个数字来打分，这个数字叫做**损失**：模型错得越多，损失越大。计算损失的规则叫**损失函数**。
+
+最常用的打分方法是这样的：每个点的残差（红色虚线）先**平方**，图里就是那些浅红色的正方形；再把所有正方形的面积**取平均**。这个数叫做**均方误差**。
+
+<Experiment id="line-fit" preset="loss-article" />
+
+拖动滑块，看正方形和下面的“均方误差”一起变化：
+
+<Stage label="直线离点远">正方形又大又多，均方误差很大。</Stage>
+
+<Stage label="直线贴近点">正方形都缩小了，均方误差变小。</Stage>
+
+<Stage label="为什么要平方">残差有正有负，直接相加会互相抵消；平方之后都是正数，而且错得多的点被罚得更重。</Stage>
+
+<Callout>有了损失函数，“训练模型”就变成了一件很明确的事：调整参数，让损失尽量小。</Callout>
+
+</Intuition>
+
+<Theory>
+
+## 均方误差和其他选择
+
+对 $N$ 个数据点，模型 $f$ 的均方误差（MSE）是：
+
+<Formula>L_{\mathrm{MSE}} = \frac{1}{N} \sum_{i=1}^{N} \bigl( f(x_i) - y_i \bigr)^2</Formula>
+
+另一种常见的选择是平均绝对误差（MAE），不平方，只取绝对值：
+
+<Formula>L_{\mathrm{MAE}} = \frac{1}{N} \sum_{i=1}^{N} \bigl| f(x_i) - y_i \bigr|</Formula>
+
+<Experiment id="line-fit" preset="loss-article" />
+
+两者的区别：MSE 对大误差特别敏感，一个离群点就能把损失拉高很多；MAE 对每个点一视同仁，更“抗干扰”。MSE 的好处是处处光滑、容易求导，所以“梯度下降”最常和它搭配。
+
+对线性回归，把 $f(x) = kx + b$ 代入，MSE 就成了 $k$ 和 $b$ 的二次函数，图像是一个碗。找最优直线，就是找这个碗的碗底。
+
+</Theory>

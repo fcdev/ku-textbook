@@ -16,7 +16,7 @@ export default function KuTabs({ id, hasExperiment, hasQuiz }: { id: string; has
         const active = path === tab.href;
         return (
           <Link key={tab.href} href={tab.href} aria-current={active ? "page" : undefined}
-            className={`-mb-px inline-flex min-h-11 items-center border-b-2 px-3 text-sm no-underline ${active ? "border-accent font-bold text-ink" : "border-transparent text-muted hover:text-ink"}`}>
+            className={`-mb-px inline-flex min-h-11 items-center border-b-2 px-3 text-sm no-underline ${active ? "border-primary font-bold text-ink" : "border-transparent text-muted hover:text-ink"}`}>
             {tab.label}
           </Link>
         );

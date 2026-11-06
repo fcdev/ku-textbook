@@ -1,10 +1,60 @@
 ---
 id: lr
 title: 学习率
+summary: 每一步迈多大。太小走不到，太大会跳过谷底。
 prerequisites: [gd]
 chapter: 6
 experiment: descent-1d
+links:
+  math: [等比数列, 数列的收敛]
+  physics: [阻尼振动]
 reading:
   - { title: "Understanding Deep Learning 第 6 章", url: "https://udlbook.github.io/udlbook/" }
-status: planned
+status: published
+authors: [c]
+reviewers: []
+estMinutes: 7
 ---
+
+<Intuition>
+
+## 步子迈多大
+
+梯度下降告诉我们往哪个方向走，**学习率**决定每一步迈多大。它是训练模型时最常调的一个数。
+
+<Experiment id="descent-1d" preset="lr-article" />
+
+先选一个学习率，再点“自动播放”，对比不同学习率下小球怎么走：
+
+<Stage label="0.01–0.1">步子太小，走了几十步还没到谷底。训练很慢。</Stage>
+
+<Stage label="0.3–0.5">步子正好，几步就到。0.5 时一步到位。</Stage>
+
+<Stage label="0.7–0.9">步子太大，越过了谷底，在两边来回跳，好在越跳越近。</Stage>
+
+<Stage label="1 及以上">跳过去的距离和原来一样远，甚至更远。小球永远到不了谷底，甚至越跳越高飞出画面，这叫**发散**。</Stage>
+
+<Callout>训练时如果损失忽高忽低、甚至变成无穷大，第一件事就是把学习率调小。</Callout>
+
+</Intuition>
+
+<Theory>
+
+## 什么时候收敛
+
+对 $L(w) = (w - 1)^2$，梯度下降的每一步满足
+
+<Formula>w_{t+1} - 1 = (1 - 2\eta)(w_t - 1)</Formula>
+
+所以 $w_t - 1 = (1 - 2\eta)^t (w_0 - 1)$，这是一个公比为 $1 - 2\eta$ 的等比数列。
+
+<Experiment id="descent-1d" preset="lr-article" />
+
+- $|1 - 2\eta| < 1$，即 $0 < \eta < 1$：收敛。公比为负（$\eta > 0.5$）时，数列正负交替，小球在谷底两边来回跳。
+- $\eta = 0.5$：公比为 0，一步到位。
+- $\eta = 1$：公比为 $-1$，永远在两点之间跳。
+- $\eta > 1$：$|1 - 2\eta| > 1$，发散。
+
+对一般的二次函数 $L(w) = a(w - w^*)^2$，临界学习率是 $1/a$：谷越陡（$a$ 越大），能用的学习率越小。真实模型在不同方向上陡峭程度不同，所以常用会自动调整步长的优化器，比如 Adam。
+
+</Theory>

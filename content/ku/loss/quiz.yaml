@@ -1,0 +1,28 @@
+- id: q1
+  type: experiment-target
+  prompt: 拖动滑块，让均方误差小于 0.03。
+  experiment: { id: line-fit, preset: practice }
+  check: { metric: mse, op: "<", value: 0.03 }
+  hint: 盯着下面的“均方误差”，一次只动一个滑块，往让它变小的方向拖。
+  explain: 均方误差已经很小了。你刚才做的，就是“训练”：调参数，让损失变小。
+- id: q2
+  type: choice
+  prompt: 为什么不直接把所有残差加起来当作损失？
+  options: [正负残差会互相抵消, 加法算起来太慢, 没有特别的原因]
+  answer: 0
+  hint: 一个点残差是 +1，另一个是 −1，加起来是多少？
+  explain: 正负抵消后，一条很差的直线也可能得到 0 分。
+- id: q3
+  type: choice
+  prompt: 一个点的残差是 0.2，另一个是 0.4。平方之后，后者是前者的几倍？
+  options: ["2 倍", "4 倍", "8 倍"]
+  answer: 1
+  hint: 0.4² ÷ 0.2² = ?
+  explain: 0.16 ÷ 0.04 = 4。误差翻倍，平方误差变成 4 倍，所以 MSE 特别在意大错误。
+- id: q4
+  type: choice
+  prompt: 一条直线的均方误差是 0，这意味着……
+  options: [它穿过了所有数据点, 它一定能准确预测新数据, 它的斜率是 0]
+  answer: 0
+  hint: 什么情况下所有残差都是 0？
+  explain: 所有残差都是 0，直线穿过了每个点。但这不代表它对新数据也准，想想“过拟合”。

@@ -82,6 +82,7 @@ export const polyFitModel: ExperimentModel = {
     practice: { params: { degree: 1, n: 10, noise: 0.2 }, visibleControls: ["degree"], seed: 7 },
     lab: { params: { degree: 4, n: 12, noise: 0.2 }, seed: 21 },
     "l2-article": { params: { degree: 12, n: 12, noise: 0.2 }, visibleControls: ["lambda"], seed: 21 },
+    "l2-practice": { params: { degree: 12, n: 12, noise: 0.2 }, visibleControls: ["lambda"], seed: 21 },
   },
   compute(params, seed) {
     return solve({ ...defaultParams(polyFitModel), ...params }, seed).metrics;

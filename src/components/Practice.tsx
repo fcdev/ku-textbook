@@ -55,7 +55,7 @@ export default function Practice({ kuId, title, quiz, unlocks }: { kuId: string;
         <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-line" role="progressbar" aria-valuemin={0} aria-valuemax={quiz.length} aria-valuenow={step} aria-label="闯关进度">
           <div className="h-full rounded-full bg-good transition-[width] duration-300" style={{ width: `${(step / quiz.length) * 100}%` }} />
         </div>
-        <span className="mono text-sm font-bold text-accent">{t.xp(xp)}</span>
+        <span className="mono rounded-full bg-accent px-2.5 py-0.5 text-sm font-bold text-on-accent">{t.xp(xp)}</span>
       </div>
 
       {done ? (
@@ -65,7 +65,7 @@ export default function Practice({ kuId, title, quiz, unlocks }: { kuId: string;
           {unlocks.length > 0 && <p className="text-muted">{t.unlockNext(unlocks)}</p>}
           <div className="flex flex-wrap justify-center gap-3 pt-2">
             <button type="button" onClick={restart} className="min-h-11 rounded-xl border border-line px-5">{t.practiceAgain}</button>
-            <Link href="/" className="inline-flex min-h-11 items-center rounded-xl bg-accent px-5 font-bold text-surface no-underline">{t.navMap}</Link>
+            <Link href="/" className="inline-flex min-h-11 items-center rounded-xl bg-primary px-5 font-bold text-on-primary no-underline">{t.navMap}</Link>
           </div>
         </div>
       ) : (
@@ -85,7 +85,7 @@ export default function Practice({ kuId, title, quiz, unlocks }: { kuId: string;
                   <button key={i} type="button" role="radio" aria-checked={sel} disabled={phase !== "ask"} onClick={() => setPicked(i)}
                     className={[
                       "flex min-h-13 items-center justify-between rounded-xl border-2 px-4 py-3 text-left text-base",
-                      showRight ? "border-good bg-good-soft" : showWrong ? "border-bad bg-bad-soft" : sel ? "border-accent bg-accent-soft" : "border-line bg-surface hover:border-accent",
+                      showRight ? "border-good bg-good-soft" : showWrong ? "border-bad bg-bad-soft" : sel ? "border-line-strong bg-accent-soft" : "border-line bg-surface hover:border-primary",
                     ].join(" ")}>
                     <span>{o}</span>
                     {showRight && <span aria-hidden className="text-good">✓</span>}
@@ -99,7 +99,7 @@ export default function Practice({ kuId, title, quiz, unlocks }: { kuId: string;
           <div>
             {phase === "ask" ? (
               <button type="button" onClick={check} disabled={q.type === "choice" && picked === null}
-                className="min-h-12 w-full rounded-xl bg-accent font-bold text-surface disabled:opacity-40">
+                className="min-h-12 w-full rounded-xl bg-primary font-bold text-on-primary disabled:opacity-40">
                 {t.check}
               </button>
             ) : (

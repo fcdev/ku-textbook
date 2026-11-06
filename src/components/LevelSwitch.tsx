@@ -23,7 +23,7 @@ export default function LevelSwitch({ children, hasTheory }: { children: ReactNo
         <div className="inline-flex rounded-full border border-line bg-surface p-1" role="group" aria-label="内容深度">
           {(["intuition", "theory"] as const).map((l) => (
             <button key={l} type="button" aria-pressed={level === l} onClick={() => pick(l)}
-              className={`min-h-10 rounded-full px-5 text-sm ${level === l ? "bg-accent font-bold text-surface" : "text-muted hover:text-ink"}`}>
+              className={`min-h-10 rounded-full px-5 text-sm ${level === l ? "bg-primary font-bold text-on-primary" : "text-muted hover:text-ink"}`}>
               {l === "intuition" ? t.levelIntuition : t.levelTheory}
             </button>
           ))}

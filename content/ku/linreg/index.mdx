@@ -1,10 +1,61 @@
 ---
 id: linreg
 title: 一元线性回归
+summary: 用一条直线概括两个量之间的关系，再用它做预测。
 prerequisites: [supervised]
 chapter: 2
 experiment: line-fit
+links:
+  math: [一次函数, 平均数]
+  physics: [匀速直线运动]
 reading:
   - { title: "Understanding Deep Learning 第 2 章", url: "https://udlbook.github.io/udlbook/" }
-status: planned
+status: published
+authors: [c]
+reviewers: []
+estMinutes: 6
 ---
+
+<Intuition>
+
+## 一条直线能说明什么
+
+气温越高，冰淇淋卖得越多；身高越高，臂展通常越长。两个量一起变的时候，我们常常想用一条直线把这种关系“概括”出来。有了这条直线，给出一个新的气温，就能估计那天大概能卖多少冰淇淋。
+
+这就是**线性回归**：从数据里找一条直线，用它来做预测。图里的<Train>蓝点</Train>是收集到的数据，粗线是我们的模型。
+
+<Experiment id="line-fit" preset="article" />
+
+试着拖动两个滑块，让直线尽量贴近所有的点：
+
+<Stage label="斜率 k">决定直线有多陡。k 是正数，直线往右上走；k 是负数，往右下走。</Stage>
+
+<Stage label="截距 b">决定直线整体往上还是往下挪，也就是 x = 0 时 y 的值。</Stage>
+
+<Stage label="红色虚线">每个点到直线的竖直距离，叫做**残差**，就是模型在这个点上猜错了多少。</Stage>
+
+<Callout>线性回归要找的，是让所有残差“加起来最小”的那条直线。“加起来最小”该怎么算，是下一个知识点“损失函数”要讲的事。</Callout>
+
+</Intuition>
+
+<Theory>
+
+## 模型、参数和残差
+
+一元线性回归的模型只有两个**参数**，斜率 $k$ 和截距 $b$：
+
+<Formula>f(x) = k x + b</Formula>
+
+对第 $i$ 个数据点 $(x_i, y_i)$，模型的预测是 $f(x_i)$，残差是预测值减真实值：
+
+<Formula>e_i = f(x_i) - y_i = k x_i + b - y_i</Formula>
+
+<Experiment id="line-fit" preset="article" />
+
+“学习”就是根据数据选出 $k$ 和 $b$。如果用残差平方的平均值来衡量好坏，最优的 $k$ 和 $b$ 有现成的公式（$\bar{x}$、$\bar{y}$ 是平均数）：
+
+<Formula>k^* = \frac{\sum_i (x_i - \bar{x})(y_i - \bar{y})}{\sum_i (x_i - \bar{x})^2}, \qquad b^* = \bar{y} - k^* \bar{x}</Formula>
+
+最优直线一定经过点 $(\bar{x}, \bar{y})$。这个公式怎么来的，在“最小二乘与均方误差”里推导。神经网络没有这样的现成公式，只能一步步去找，这就是“梯度下降”。
+
+</Theory>

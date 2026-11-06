@@ -1,10 +1,59 @@
 ---
 id: gd
 title: 梯度下降
+summary: 蒙着眼下山：摸摸脚下的坡，往低处走一小步。
 prerequisites: [loss]
 chapter: 6
 experiment: descent-1d
+links:
+  math: [导数, 切线斜率, 数列]
+  physics: [势能与小球滚动]
 reading:
   - { title: "Understanding Deep Learning 第 6 章", url: "https://udlbook.github.io/udlbook/" }
-status: planned
+status: published
+authors: [c]
+reviewers: []
+estMinutes: 8
 ---
+
+<Intuition>
+
+## 蒙着眼下山
+
+想象你蒙着眼站在山坡上，要走到谷底。看不见路，但能用脚感觉地面往哪边倾斜。最简单的办法是：每次往**下坡**的方向迈一小步，然后再感觉一次，再迈一步。
+
+训练模型也是这样。图里的曲线是损失随参数 $w$ 变化的样子，小球是当前的参数。我们想让损失最小，就是让小球走到谷底。橙色的线是小球所在位置的**切线**，它的坡度叫**梯度**。
+
+<Experiment id="descent-1d" preset="article" />
+
+点“走一步”，一步一步看小球怎么走：
+
+<Stage label="离谷底远">坡很陡，小球一步迈得很大。</Stage>
+
+<Stage label="靠近谷底">坡变缓了，步子自动变小，小球慢慢停在谷底。</Stage>
+
+<Stage label="方向">坡往右上（梯度为正），就往左走；坡往左上（梯度为负），就往右走。永远朝着下坡。</Stage>
+
+<Callout>真实的神经网络有几百万到上千亿个参数，相当于在一座维度极高的山里下山。但每一步的做法和这里完全一样：算出坡度，往下坡挪一小步。</Callout>
+
+</Intuition>
+
+<Theory>
+
+## 更新公式
+
+每一步，参数沿着梯度的反方向移动，移动的距离等于梯度乘以一个小正数 $\eta$（学习率）：
+
+<Formula>w_{t+1} = w_t - \eta \, L'(w_t)</Formula>
+
+这里的损失函数是 $L(w) = (w - 1)^2$，最低点在 $w^* = 1$，导数是 $L'(w) = 2(w - 1)$。代入更新公式：
+
+<Formula>w_{t+1} - 1 = (1 - 2\eta)(w_t - 1)</Formula>
+
+<Experiment id="descent-1d" preset="article" />
+
+也就是说，每走一步，离最低点的距离都乘以 $|1 - 2\eta|$。$\eta = 0.1$ 时这个数是 0.8，所以距离按 0.8、0.64、0.512…… 逐步缩小，这是一个等比数列。
+
+参数不止一个时，导数换成**梯度**（每个参数方向上的偏导数组成的向量），公式形式不变。神经网络里求梯度的方法叫“反向传播”。
+
+</Theory>

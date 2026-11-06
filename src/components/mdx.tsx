@@ -26,14 +26,14 @@ export function Experiment({ id, preset = "article", sweep }: { id: string; pres
 export function Stage({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="grid gap-1 sm:grid-cols-[5.5em_1fr] sm:gap-3 rounded-lg border border-line bg-surface px-4 py-3 text-[15px]">
-      <b className="mono text-sm text-accent">{label}</b>
+      <b className="mono text-sm text-ink">{label}</b>
       <span>{children}</span>
     </div>
   );
 }
 
 export function Callout({ children }: { children: ReactNode }) {
-  return <div className="rounded-lg border-l-4 border-accent bg-accent-soft px-4 py-3">{children}</div>;
+  return <div className="rounded-lg border-l-4 border-line-strong bg-accent-soft px-4 py-3">{children}</div>;
 }
 
 export function Train({ children }: { children: ReactNode }) {

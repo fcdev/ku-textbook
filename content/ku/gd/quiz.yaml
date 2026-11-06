@@ -1,0 +1,28 @@
+- id: q1
+  type: experiment-target
+  prompt: 用“走一步”或“自动播放”，把小球走到离最低点 0.01 以内。
+  experiment: { id: descent-1d, preset: practice }
+  check: { metric: dist, op: "<", value: 0.01 }
+  hint: 越靠近谷底步子越小，需要多走几步。试试“自动播放”。
+  explain: 走了二十多步才到。每一步离谷底的距离都缩小成原来的 0.8 倍。
+- id: q2
+  type: choice
+  prompt: 小球在 w = 3 处，这里的坡往右上（梯度为正）。下一步 w 会……
+  options: [变大, 变小, 不变]
+  answer: 1
+  hint: 梯度下降永远往下坡走。坡往右上，下坡在哪边？
+  explain: 梯度为正，w 减去一个正数，所以变小，小球往左走。
+- id: q3
+  type: choice
+  prompt: 学习率不变，小球越靠近谷底，每一步走得……
+  options: [越来越大, 越来越小, 一样大]
+  answer: 1
+  hint: 步长 = 学习率 × 坡度。谷底附近坡度怎样？
+  explain: 谷底附近坡度接近 0，所以步子也接近 0。
+- id: q4
+  type: choice
+  prompt: 数学题：L(w) = (w − 1)²，在 w = 3 处的导数是多少？
+  options: ["2", "4", "6"]
+  answer: 1
+  hint: L′(w) = 2(w − 1)。
+  explain: 2 × (3 − 1) = 4。导数就是切线的斜率。

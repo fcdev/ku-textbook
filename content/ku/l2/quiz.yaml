@@ -1,0 +1,28 @@
+- id: q1
+  type: experiment-target
+  prompt: 阶数固定在 12。拖动 λ，让测试误差尽量小。
+  experiment: { id: poly-fit, preset: l2-practice }
+  check: { metric: testMSE, op: "near-min", over: lambda, tolerance: { steps: 1, ratio: 1.6 } }
+  hint: λ 关的时候测试误差很大，λ 最大时也不小。最好的在中间。
+  explain: λ 适中时，曲线既不乱跳，也没有被压平。
+- id: q2
+  type: choice
+  prompt: 把 λ 调到非常大，曲线会变成什么样？
+  options: [接近一条水平线, 穿过所有点, 没有变化]
+  answer: 0
+  hint: 除了常数项，其他系数都被罚得接近 0。
+  explain: 只剩常数项 w₀ 不受罚，曲线就成了 y ≈ 常数。
+- id: q3
+  type: choice
+  prompt: L2 正则化惩罚的是……
+  options: [参数的平方和, 训练数据的个数, 多项式的阶数]
+  answer: 0
+  hint: 名字里的“L2”指的是平方和。
+  explain: 它在损失里加上 λ × 参数平方和，让参数别太大。
+- id: q4
+  type: choice
+  prompt: 一个模型过拟合了，下面哪个做法最可能有帮助？
+  options: [加大 λ, 把 λ 设为 0, 增加多项式阶数]
+  answer: 0
+  hint: 过拟合是模型太“自由”了。
+  explain: 加大正则化，约束模型，是对付过拟合的常用办法。

@@ -1,0 +1,28 @@
+- id: q1
+  type: experiment-target
+  prompt: 拖动两个滑块，让直线尽量贴近所有蓝点。
+  experiment: { id: line-fit, preset: practice }
+  check: { metric: gap, op: "<", value: 0.01 }
+  hint: 先调斜率让直线的倾斜方向和点一致，再调截距把它整体挪到点中间。
+  explain: 红色虚线都很短了。这条直线就是这组数据的线性回归。
+- id: q2
+  type: choice
+  prompt: 直线 y = 2x + 1 上，x 增加 1，y 增加多少？
+  options: ["1", "2", "3"]
+  answer: 1
+  hint: 斜率就是 x 每增加 1 时 y 的变化量。
+  explain: 斜率是 2，所以 x 每增加 1，y 增加 2。
+- id: q3
+  type: choice
+  prompt: 只把截距 b 调大，直线会怎样变化？
+  options: [整体向上平移, 变得更陡, 绕原点旋转]
+  answer: 0
+  hint: 截距是 x = 0 时 y 的值，它不影响倾斜程度。
+  explain: 斜率不变，只是整条直线往上挪了。
+- id: q4
+  type: choice
+  prompt: 某个数据点的残差是 −0.3，这说明……
+  options: [模型的预测比真实值低 0.3, 模型的预测比真实值高 0.3, 这个点不在图上]
+  answer: 0
+  hint: 残差 = 预测值 − 真实值。
+  explain: 残差为负，说明预测值比真实值小。

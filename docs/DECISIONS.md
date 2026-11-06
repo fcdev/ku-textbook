@@ -10,9 +10,12 @@
 - 2026-11-05 · 桌面文章页用 CSS grid 把 `<Experiment>` 放到右栏并 sticky；手机上实验留在正文中间。
 - 2026-11-05 · 题目 `experiment.hide` 可隐藏的图层由实验声明（poly-fit：`testPoints`、`truth`、`trainPoints`、`model`），ku-lint 校验。
 - 2026-11-05 · 实验题的判分 seed 取 preset 的 seed；闯关里实验题不能重新采样，保证标准答案稳定。
-- 2026-11-05 · 第 1 周搜索先用构建期生成的文本 + 客户端子串匹配（含“第 N 章”），FlexSearch 留到第 2 周（KU 数量上来再换）。依赖已装好。
-- 2026-11-05 · 字体用系统字体栈（苹方 / 思源 / 雅黑），没有自托管字体文件；等 Design 定字体后再子集化思源黑体 / 宋体。
-- 2026-11-05 · 主题色值暂用样机配色，集中在 `src/app/globals.css` 的 `@theme static` 和暗色覆盖里，Design 出 token 后整段替换。
+- 2026-11-06 · 搜索没有用 FlexSearch：构建期生成索引（标题、摘要、跨学科标签、直觉层正文、章节），客户端按命中位置打分（`lib/search.ts`）。FlexSearch 对中文需要自定义分词，几百个 KU 以内子串匹配更准也更小；超过一千个再换。
+- 2026-11-06 · 字体按设计稿用 Noto Sans SC / Noto Serif SC / JetBrains Mono，但只写在字体栈里、不从 Google 加载；没装的设备回落到苹方 / 雅黑。正式上线前把思源子集化后放进 `public/fonts`。
+- 2026-11-06 · 主题 token 换成 Claude Design 画布的亮 / 暗 / 投屏三套（`src/app/globals.css`）。设计里 model 是黑线、主按钮是黑色（`primary`），学习路径用荧光笔黄（`accent`），链接和焦点环用蓝（`focus`）。
 - 2026-11-05 · 闯关全部答完才写入进度（done=true，xp 取历史最高）。
 - 2026-11-05 · 知识地图：桌面是 SVG 分层图，手机改成按层的竖向按钮列表（DESIGN §5 允许）。
-- 2026-11-05 · `lr`、`linreg` 等另外 5 个完整 KU 第 1 周仍是 `planned`；`line-fit`、`descent-1d` 记在 `plannedExperiments` 里，ku-lint 允许 planned KU 引用。
+- 2026-11-06 · 5 个完整 KU（linreg、loss、gd、lr、l2）的正文和题目由 Claude 起草，待作者审核；全部原创，没有用 UDL 的文字或图。
+- 2026-11-06 · `descent-1d` 用纯二次损失 L(w) = (w − 1)²，临界学习率有解析解（0.5 一步到位、1 来回跳、> 1 发散），便于出题和写原理层。
+- 2026-11-06 · `descent-1d` 的指标 `stepsTo` 按 60 步内的完整轨迹算，与当前已走步数无关，这样“选一个学习率”的题不用学生先点完播放。
+- 2026-11-06 · `src/lib/content.test.ts` 对每道实验题做网格搜索：默认状态不能直接答对，可见滑块的取值里一定有解。作者改题后跑 `pnpm test` 就能发现出错的题。
