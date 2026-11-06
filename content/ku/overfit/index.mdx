@@ -24,15 +24,21 @@ estMinutes: 8
 
 图里的<Train>蓝点</Train>是模型学习时看到的数据，<Test>橙圈</Test>是它从没见过的新数据。模型要做的，是找一条曲线去“解释”这些点。
 
-<Experiment id="poly-fit" preset="article" />
+<Predict id="degree-up" ch="fit" gate question="曲线越弯，越能贴住蓝点。如果把曲线的“弯曲程度”一直调高，它离橙圈（新数据）会怎样？" options="越来越近|先变近，再变远|越来越远|几乎不变" answer="1">
 
-拖动滑块，改变曲线能有多弯，也就是多项式的**阶数**：
+太直的曲线连蓝点都对不上，调弯一点，蓝点和橙圈都会贴得更近。可是弯过了头，曲线就开始迁就蓝点里的随机误差，在点和点之间乱拐，离橙圈反而越来越远。下面的实验就能看到这个“先近后远”。
 
-<Stage label="1–2 阶">曲线太直，连蓝点都对不上。这是**欠拟合**，像没复习的学生。</Stage>
+</Predict>
 
-<Stage label="3–5 阶">曲线大致跟着点走，橙圈也离得不远。这是我们想要的。</Stage>
+<Experiment id="poly-fit" preset="article" ch="fit" />
 
-<Stage label="9 阶以上">曲线穿过了每一个蓝点，却在点和点之间乱跳，离橙圈越来越远。这就是背答案。</Stage>
+曲线能有多弯，由多项式的**阶数**决定。现在是 <Knob ch="fit" name="degree" /> 阶，左右拖这个数字或者右边的滑块都可以。往下读，图会跟着切换：
+
+<Stage label="1–2 阶" ch="fit" set="degree=1">曲线太直，连蓝点都对不上。这是**欠拟合**，像没复习的学生。</Stage>
+
+<Stage label="3–5 阶" ch="fit" set="degree=4">曲线大致跟着点走，橙圈也离得不远。这是我们想要的。</Stage>
+
+<Stage label="9 阶以上" ch="fit" set="degree=10">曲线穿过了每一个蓝点，却在点和点之间乱跳，离橙圈越来越远。这就是背答案。</Stage>
 
 <Callout>判断模型好不好，要看它在**没见过的数据**上表现如何，而不是在练习题上。所以我们总要留一部分数据不给模型看，专门用来考它。</Callout>
 
@@ -47,6 +53,12 @@ estMinutes: 8
 <Formula>f(x) = w_0 + w_1 x + w_2 x^2 + \cdots + w_d x^d</Formula>
 
 <Formula>L(w) = \frac{1}{N}\sum_{i=1}^{N} \bigl( f(x_i) - y_i \bigr)^2</Formula>
+
+<DrawIt id="u-curve" exp="poly-fit" preset="lab" over="degree" metric="testMSE" also="trainMSE" log question="动手之前先画一画：12 个训练点，阶数从 0 调到 12，测试误差会怎么变？">
+
+橙线是测试误差，蓝线是训练误差。训练误差一路下降，测试误差先降后升，最低点就是偏差和方差最平衡的阶数。
+
+</DrawIt>
 
 <Experiment id="poly-fit" preset="article" sweep />
 

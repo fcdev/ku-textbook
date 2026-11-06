@@ -1,6 +1,10 @@
 import katex from "katex";
 import type { ReactNode } from "react";
 import ExperimentEmbed from "./ExperimentEmbed";
+import DrawIt from "./interactive/DrawIt";
+import Knob from "./interactive/Knob";
+import Predict from "./interactive/Predict";
+import StageSync from "./interactive/StageSync";
 
 /** KaTeX 在服务端渲染成 HTML，客户端不加载 KaTeX JS（SPEC §5.1）。 */
 export function Formula({ tex }: { tex: string }) {
@@ -15,15 +19,17 @@ export function Theory({ children }: { children: ReactNode }) {
   return <div data-section="theory" className="ku-level ku-prose">{children}</div>;
 }
 
-export function Experiment({ id, preset = "article", sweep }: { id: string; preset?: string; sweep?: boolean }) {
+export function Experiment({ id, preset = "article", sweep, ch }: { id: string; preset?: string; sweep?: boolean; ch?: string }) {
   return (
     <div className="exp-block">
-      <ExperimentEmbed id={id} preset={preset} showSweep={!!sweep} />
+      <ExperimentEmbed id={id} preset={preset} showSweep={!!sweep} channel={ch} />
     </div>
   );
 }
 
-export function Stage({ label, children }: { label: string; children: ReactNode }) {
+/** 分段说明。带 ch + set 时变成滚动联动：滚到这一段就把实验切到 set 描述的状态。 */
+export function Stage({ label, children, ch, exp, preset, set }: { label: string; children: ReactNode; ch?: string; exp?: string; preset?: string; set?: string }) {
+  if (ch && exp && set) return <StageSync label={label} ch={ch} exp={exp} preset={preset} set={set}>{children}</StageSync>;
   return (
     <div className="grid gap-1 sm:grid-cols-[5.5em_1fr] sm:gap-3 rounded-lg border border-line bg-surface px-4 py-3 text-[15px]">
       <b className="mono text-sm text-ink">{label}</b>
@@ -43,7 +49,7 @@ export function Test({ children }: { children: ReactNode }) {
   return <span className="font-medium text-test-text">{children}</span>;
 }
 
-export const mdxComponents = { Formula, Intuition, Theory, Experiment, Stage, Callout, Train, Test };
+export const mdxComponents = { Formula, Intuition, Theory, Experiment, Stage, Callout, Train, Test, Knob, Predict, DrawIt };
 
 /**
  * 把 <Formula>tex</Formula> 改写成 <Formula tex="..." />，避免 MDX 把 _ 和 \ 当成 Markdown。

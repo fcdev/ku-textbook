@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
-for (const url of ["/", "/ku/overfit", "/ku/overfit/practice", "/ku/gd/lab", "/path/l2", "/teacher/login"]) {
+for (const url of ["/", "/ku/overfit", "/ku/overfit/practice", "/ku/gd", "/ku/gd/lab", "/play", "/path/l2", "/teacher/login"]) {
   test(`无严重可访问性问题：${url}`, async ({ page }) => {
     await page.goto(url);
     const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();

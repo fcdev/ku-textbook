@@ -7,6 +7,7 @@ import { grade, XP_PER_CORRECT } from "@/lib/quiz";
 import { writeProgress } from "@/lib/progress";
 import type { Question } from "@/lib/schema";
 import { t } from "@/lib/strings";
+import { Stamp } from "./Stamp";
 
 type Phase = "ask" | "right" | "wrong";
 
@@ -60,6 +61,8 @@ export default function Practice({ kuId, title, quiz, unlocks }: { kuId: string;
 
       {done ? (
         <div className="space-y-3 rounded-[var(--radius-ku)] border border-line bg-surface p-8 text-center">
+          <div className="flex justify-center"><Stamp title={title} date={new Date().toISOString()} size={140} animate /></div>
+          <p className="text-sm font-bold text-bad">{t.stampEarned}</p>
           <div className="mono text-4xl font-bold text-good">+{xp} XP</div>
           <h2 className="text-2xl font-bold">{t.doneTitle(title)}</h2>
           {unlocks.length > 0 && <p className="text-muted">{t.unlockNext(unlocks)}</p>}

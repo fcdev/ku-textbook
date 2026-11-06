@@ -7,6 +7,7 @@ import rehypeKatex from "rehype-katex";
 import LevelSwitch from "@/components/LevelSwitch";
 import { mdxComponents, preprocessFormulas } from "@/components/mdx";
 import { getContent, getKu } from "@/lib/content";
+import { preprocessInteractive } from "@/lib/interactive";
 import { t } from "@/lib/strings";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -36,7 +37,7 @@ export default async function KuArticle({ params }: { params: Promise<{ id: stri
   }
 
   const { content } = await compileMDX({
-    source: preprocessFormulas(ku.body),
+    source: preprocessInteractive(preprocessFormulas(ku.body), ku.id),
     components: mdxComponents,
     options: { mdxOptions: { remarkPlugins: [remarkGfm, remarkMath], rehypePlugins: [rehypeKatex] } },
   });

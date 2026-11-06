@@ -49,6 +49,8 @@ export interface ExperimentProps {
   readOnly?: boolean;
   /** 原理层：额外显示误差-参数曲线 */
   showSweep?: boolean;
+  /** 文章联动通道（见 experiments/channel.ts）。有它时参数和正文的 Knob / Stage / Predict 共享 */
+  channel?: string;
 }
 
 export interface ExperimentDef extends ExperimentModel {

@@ -22,17 +22,23 @@ estMinutes: 7
 
 梯度下降告诉我们往哪个方向走，**学习率**决定每一步迈多大。它是训练模型时最常调的一个数。
 
-<Experiment id="descent-1d" preset="lr-article" />
+<Predict id="lr-big" ch="lr" gate question="把学习率从 0.1 调到 1.05，小球会怎样？" options="更快到谷底|越过谷底，来回跳几下后停下|越跳越远，再也回不来" answer="2">
 
-先选一个学习率，再点“自动播放”，对比不同学习率下小球怎么走：
+学习率超过 1 时，每一步都越过谷底，而且落点比出发点离谷底更远。距离每步乘以 |1 − 2η| = 1.1，越滚越大，这就是发散。
 
-<Stage label="0.01–0.1">步子太小，走了几十步还没到谷底。训练很慢。</Stage>
+</Predict>
 
-<Stage label="0.3–0.5">步子正好，几步就到。0.5 时一步到位。</Stage>
+<Experiment id="descent-1d" preset="lr-article" ch="lr" />
 
-<Stage label="0.7–0.9">步子太大，越过了谷底，在两边来回跳，好在越跳越近。</Stage>
+现在学习率是 <Knob ch="lr" name="lr" />。选一个学习率，再点“自动播放”，对比小球怎么走。往下读，图会自动切到每种情形：
 
-<Stage label="1 及以上">跳过去的距离和原来一样远，甚至更远。小球永远到不了谷底，甚至越跳越高飞出画面，这叫**发散**。</Stage>
+<Stage label="0.01–0.1" ch="lr" set="lr=0.05; steps=30">步子太小，走了几十步还没到谷底。训练很慢。</Stage>
+
+<Stage label="0.3–0.5" ch="lr" set="lr=0.3; steps=10">步子正好，几步就到。0.5 时一步到位。</Stage>
+
+<Stage label="0.7–0.9" ch="lr" set="lr=0.9; steps=12">步子太大，越过了谷底，在两边来回跳，好在越跳越近。</Stage>
+
+<Stage label="1 及以上" ch="lr" set="lr=1.05; steps=20">跳过去的距离和原来一样远，甚至更远。小球永远到不了谷底，甚至越跳越高飞出画面，这叫**发散**。</Stage>
 
 <Callout>训练时如果损失忽高忽低、甚至变成无穷大，第一件事就是把学习率调小。</Callout>
 
