@@ -1,5 +1,7 @@
 # KU 互动教材
 
+在线演示：https://fcdev.github.io/ku-textbook/
+
 AI 通识教材网站：每个知识单元（KU）= 一个核心概念 + 一个浏览器内的交互实验 + 几道即时反馈的题。规格见 [docs/SPEC.md](docs/SPEC.md)，实现取舍见 [docs/DECISIONS.md](docs/DECISIONS.md)。
 
 ## 跑起来
