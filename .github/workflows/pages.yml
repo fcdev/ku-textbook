@@ -20,9 +20,10 @@ jobs:
       - run: pnpm build
         env:
           STATIC_EXPORT: "1"
-          BASE_PATH: /${{ github.event.repository.name }}
+          # 自定义域名 ku-textbook.fcdev.me 部署在根路径；不用自定义域名时改回 /${{ github.event.repository.name }}
+          BASE_PATH: ""
           NEXT_TELEMETRY_DISABLED: "1"
-      - run: touch out/.nojekyll
+      - run: touch out/.nojekyll && echo "ku-textbook.fcdev.me" > out/CNAME
       - uses: actions/upload-pages-artifact@v3
         with: { path: out }
   deploy:
