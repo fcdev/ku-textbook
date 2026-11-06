@@ -1,4 +1,3 @@
-import "server-only";
 import path from "node:path";
 import { drizzle as drizzlePg, type PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import * as schema from "./schema";

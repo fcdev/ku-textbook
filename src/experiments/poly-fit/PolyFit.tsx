@@ -116,7 +116,7 @@ function SweepPlot({ sweep, degree }: { sweep: { value: number; metrics: Record<
       overlay={
         <>
           <text x={SWEEP.W - SWEEP.right + 6} y={sy(SWEEP, ly(last.metrics.trainMSE)) + 4} style={{ fill: "var(--color-train)" }}>训练</text>
-          <text x={SWEEP.W - SWEEP.right + 6} y={sy(SWEEP, ly(last.metrics.testMSE)) + 4} style={{ fill: "var(--color-test)" }}>测试</text>
+          <text x={SWEEP.W - SWEEP.right + 6} y={sy(SWEEP, ly(last.metrics.testMSE)) + 4} style={{ fill: "var(--color-test-text)" }}>测试</text>
         </>
       }
     >

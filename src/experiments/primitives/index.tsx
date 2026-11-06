@@ -104,7 +104,7 @@ export function Readout({ train, test }: { train?: number; test?: number }) {
       {test !== undefined && (
         <span className="inline-flex items-center gap-2">
           <i aria-hidden className="inline-block size-2.5 rounded-full border-2 border-test" />
-          测试误差 <b className="mono inline-block min-w-[5ch] text-test">{formatError(test)}</b>
+          测试误差 <b className="mono inline-block min-w-[5ch] text-test-text">{formatError(test)}</b>
         </span>
       )}
     </div>
@@ -131,7 +131,7 @@ export function Legend({ items }: { items: ("train" | "test" | "model" | "truth"
 
 /* ---------- 通用读数 ---------- */
 export function Metric({ label, value, tone = "ink", mark }: { label: string; value: string; tone?: "ink" | "train" | "test" | "model" | "good" | "bad"; mark?: ReactNode }) {
-  const color = { ink: "text-ink", train: "text-train", test: "text-test", model: "text-ink", good: "text-good", bad: "text-bad" }[tone];
+  const color = { ink: "text-ink", train: "text-train", test: "text-test-text", model: "text-ink", good: "text-good", bad: "text-bad" }[tone];
   return (
     <span className="inline-flex items-center gap-2">
       {mark}

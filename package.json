@@ -7,7 +7,9 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "ku:lint": "tsx scripts/ku-lint.ts"
+    "ku:lint": "tsx scripts/ku-lint.ts",
+    "e2e": "playwright test",
+    "invite": "tsx scripts/invite.ts"
   },
   "packageManager": "pnpm@10.28.0",
   "dependencies": {
@@ -29,6 +31,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "1.63.0",
     "@tailwindcss/postcss": "^4.3.4",
     "@types/katex": "^0.16.8",

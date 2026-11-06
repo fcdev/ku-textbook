@@ -18,6 +18,8 @@
   --color-grid-major: #DCD8CC;
   --color-train: #1F63D1;
   --color-test: #D9530F;
+  /* 测试色用作文字时的深一档，保证 4.5:1 对比度 */
+  --color-test-text: #B03F00;
   --color-model: #17181C;
   --color-truth: #8C9099;
   --color-accent: #F4C430;
@@ -43,7 +45,7 @@
   :root:not([data-theme="light"]) {
     --color-bg: #131418; --color-surface: #1B1D22; --color-surface-2: #24262D; --color-ink: #EDEBE5; --color-ink-2: #BFC1C7; --color-muted: #999CA5;
     --color-line: #30333B; --color-line-strong: #4A4D57; --color-grid: #212329; --color-grid-major: #2D3038;
-    --color-train: #6CA6FF; --color-test: #FF8F45; --color-model: #F3F0E8; --color-truth: #8F949E;
+    --color-train: #6CA6FF; --color-test: #FF8F45; --color-test-text: #FF8F45; --color-model: #F3F0E8; --color-truth: #8F949E;
     --color-accent: #F4C430; --color-accent-soft: #3B3318; --color-on-accent: #131418; --color-primary: #F3F0E8; --color-on-primary: #131418;
     --color-good: #4DC274; --color-good-soft: #15301F; --color-bad: #FF7B6E; --color-bad-soft: #3A1C19; --color-focus: #6CA6FF;
     --shadow-card: 0 1px 0 rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
@@ -53,7 +55,7 @@
 :root[data-theme="dark"] {
   --color-bg: #131418; --color-surface: #1B1D22; --color-surface-2: #24262D; --color-ink: #EDEBE5; --color-ink-2: #BFC1C7; --color-muted: #999CA5;
   --color-line: #30333B; --color-line-strong: #4A4D57; --color-grid: #212329; --color-grid-major: #2D3038;
-  --color-train: #6CA6FF; --color-test: #FF8F45; --color-model: #F3F0E8; --color-truth: #8F949E;
+  --color-train: #6CA6FF; --color-test: #FF8F45; --color-test-text: #FF8F45; --color-model: #F3F0E8; --color-truth: #8F949E;
   --color-accent: #F4C430; --color-accent-soft: #3B3318; --color-on-accent: #131418; --color-primary: #F3F0E8; --color-on-primary: #131418;
   --color-good: #4DC274; --color-good-soft: #15301F; --color-bad: #FF7B6E; --color-bad-soft: #3A1C19; --color-focus: #6CA6FF;
   --shadow-card: 0 1px 0 rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
@@ -63,7 +65,7 @@
 .theme-projector {
   --color-bg: #FFFFFF; --color-surface: #FFFFFF; --color-surface-2: #F0F0EC; --color-ink: #000000; --color-ink-2: #1E1E1E; --color-muted: #3A3A3A;
   --color-line: #8A8A8A; --color-line-strong: #5A5A5A; --color-grid: #E6E6E6; --color-grid-major: #C4C4C4;
-  --color-train: #0F4FC0; --color-test: #D24600; --color-model: #000000; --color-truth: #6A6A6A;
+  --color-train: #0F4FC0; --color-test: #D24600; --color-test-text: #A33600; --color-model: #000000; --color-truth: #6A6A6A;
   --color-accent: #FFC800; --color-accent-soft: #FFF0B3; --color-on-accent: #000000; --color-primary: #000000; --color-on-primary: #FFFFFF;
   --color-good: #0B6B2B; --color-good-soft: #DDF2E2; --color-bad: #B3261E; --color-bad-soft: #FBE1DE; --color-focus: #0F4FC0;
   color-scheme: light; background: var(--color-bg); color: var(--color-ink);

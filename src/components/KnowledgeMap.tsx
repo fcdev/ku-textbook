@@ -62,7 +62,7 @@ export default function KnowledgeMap({ kus, index }: { kus: KuMeta[]; index: Sea
 
       {/* 桌面：前置关系图 */}
       <div className="hidden overflow-x-auto rounded-[var(--radius-ku)] border border-line bg-surface p-3 md:block">
-        <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ minWidth: 900 }} className="block h-auto" role="img" aria-label={`${kus.length} 个知识点的前置关系图`}>
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ minWidth: 900 }} className="block h-auto" role="group" aria-label={`${kus.length} 个知识点的前置关系图`}>
           {graph.nodes.flatMap((k) =>
             k.prerequisites.map((p) => {
               const a = pos.get(p)!, b = pos.get(k.id)!;
@@ -116,7 +116,7 @@ export default function KnowledgeMap({ kus, index }: { kus: KuMeta[]; index: Sea
                     className={[
                       "relative min-h-11 rounded-lg border px-3 text-left text-sm",
                       s.isTarget ? "border-accent bg-primary font-bold text-on-primary" : s.inPath ? "border-line-strong bg-accent-soft" : "border-line bg-surface",
-                      s.planned && !s.isTarget ? "border-dashed text-muted" : "",
+                      s.planned && !s.isTarget ? (s.inPath ? "border-dashed text-ink-2" : "border-dashed text-muted") : "",
                       s.dim ? "opacity-30" : "",
                     ].join(" ")}>
                     {n !== undefined && <span className="mono mr-1.5 inline-grid size-5 place-items-center rounded-full bg-accent text-[11px] text-on-accent">{n}</span>}

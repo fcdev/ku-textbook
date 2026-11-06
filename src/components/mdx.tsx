@@ -40,7 +40,7 @@ export function Train({ children }: { children: ReactNode }) {
   return <span className="font-medium text-train">{children}</span>;
 }
 export function Test({ children }: { children: ReactNode }) {
-  return <span className="font-medium text-test">{children}</span>;
+  return <span className="font-medium text-test-text">{children}</span>;
 }
 
 export const mdxComponents = { Formula, Intuition, Theory, Experiment, Stage, Callout, Train, Test };

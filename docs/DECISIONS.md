@@ -19,3 +19,13 @@
 - 2026-11-06 · `descent-1d` 用纯二次损失 L(w) = (w − 1)²，临界学习率有解析解（0.5 一步到位、1 来回跳、> 1 发散），便于出题和写原理层。
 - 2026-11-06 · `descent-1d` 的指标 `stepsTo` 按 60 步内的完整轨迹算，与当前已走步数无关，这样“选一个学习率”的题不用学生先点完播放。
 - 2026-11-06 · `src/lib/content.test.ts` 对每道实验题做网格搜索：默认状态不能直接答对，可见滑块的取值里一定有解。作者改题后跑 `pnpm test` 就能发现出错的题。
+- 2026-11-06 · 教师端路由用查询参数（`/teacher/course?id=…`、`/teacher/plan?id=…`、`/present?course=…`），没有用 SPEC 里的 `[id]` 动态段，这样同一套页面能静态导出到 GitHub Pages。
+- 2026-11-06 · 需要服务端的接口文件命名为 `route.server.ts`，`next.config.ts` 里只有非静态导出时才把 `server.ts` 加进 `pageExtensions`。
+- 2026-11-06 · 教师端数据接口有两套实现（`src/teacher/api-http.ts` / `api-demo.ts`），静态导出时用演示实现：数据存 localStorage，邀请码固定 `KU-DEMO`，教案用模板生成。
+- 2026-11-06 · 会话不建表：cookie 里放 `teacherId.过期时间.HMAC`（SESSION_SECRET 签名），30 天有效。缺点是不能单独吊销某个会话，换 SESSION_SECRET 会让所有人重新登录。
+- 2026-11-06 · 没设 `DATABASE_URL` 时用内嵌 PGlite，迁移在首次连接时自动执行。生产环境不会自动建邀请码，除非设置 `SEED_INVITE`。
+- 2026-11-06 · 教案的模板生成器每个知识点只引用前 2 道题；课堂流程分钟数按“导入 5 + 各 KU 平均 + 随堂练习约 15% + 小结 5”分配，总和严格等于 45 × 课时。
+- 2026-11-06 · 教案 prompt 在 `prompts/lesson-plan.md`，frontmatter 里的 `version` 写进 `lesson_plans.prompt_version`；模板生成的记为 `template`。
+- 2026-11-06 · 教案预览用自己写的极简 Markdown 渲染（`lib/md.ts`，先转义 HTML），没有引入 Markdown 库。
+- 2026-11-06 · 实验组件用 `next/dynamic` 按需加载，每个 KU 页只下载自己的实验。Lighthouse 移动端：`/ku/overfit` 性能 99、可访问性 100。
+- 2026-11-06 · 测试数据点颜色 `--color-test` 用作文字时对比度不够 4.5:1，加了 `--color-test-text`（亮色 #B03F00）专门给文字用，图上的点仍用设计色。
