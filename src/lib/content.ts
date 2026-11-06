@@ -92,6 +92,7 @@ export function toMeta(k: Ku): KuMeta {
 export function intuitionText(k: Ku): string {
   const m = k.body.match(/<Intuition>([\s\S]*?)<\/Intuition>/);
   return (m ? m[1] : "")
+    .replace(/^#{1,6}\s.*$/gm, " ")
     .replace(/<[^>]+>/g, " ")
     .replace(/[#*`$]/g, "")
     .replace(/\s+/g, " ")

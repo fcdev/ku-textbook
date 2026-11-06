@@ -3,7 +3,7 @@ import Link from "next/link";
 import "katex/dist/katex.min.css";
 import "./globals.css";
 import ThemeToggle from "@/components/ThemeToggle";
-import { t } from "@/lib/strings";
+import { t, tt } from "@/lib/strings";
 
 export const metadata: Metadata = {
   title: { default: t.siteName, template: `%s · ${t.siteName}` },
@@ -29,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="font-display text-lg font-bold text-ink no-underline">{t.siteName}</Link>
             <nav className="flex gap-4 text-sm">
               <Link href="/" className="text-muted no-underline hover:text-ink">{t.navMap}</Link>
+              <Link href="/teacher" className="text-muted no-underline hover:text-ink">{tt.navTeacher}</Link>
             </nav>
             <div className="ml-auto"><ThemeToggle /></div>
           </div>

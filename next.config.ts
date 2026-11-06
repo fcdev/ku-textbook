@@ -6,6 +6,10 @@ const isExport = process.env.STATIC_EXPORT === "1";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // 需要服务端的文件（API）命名为 *.server.ts，静态导出时不参与构建
+  pageExtensions: isExport ? ["tsx", "ts"] : ["tsx", "ts", "server.ts"],
+  serverExternalPackages: ["@electric-sql/pglite", "@node-rs/argon2"],
+  env: { NEXT_PUBLIC_DEMO: isExport ? "1" : (process.env.NEXT_PUBLIC_DEMO ?? "") },
   ...(isExport ? { output: "export", trailingSlash: true, basePath: process.env.BASE_PATH || undefined } : {}),
 };
 
