@@ -1,0 +1,28 @@
+- id: q1
+  type: experiment-target
+  prompt: 拖动滑块，让曲线穿过所有蓝点。
+  experiment: { id: poly-fit, preset: practice, hide: [testPoints] }
+  check: { metric: trainMSE, op: "<", value: 0.002 }
+  hint: 阶数越高，曲线能拐的弯越多。10 个点需要几个弯？
+  explain: 训练误差几乎是 0，曲线穿过了每个蓝点。但看看橙圈，它们离曲线有多远？
+- id: q2
+  type: experiment-target
+  prompt: 现在看橙圈。把阶数调到测试误差最小的位置。
+  experiment: { id: poly-fit, preset: practice }
+  check: { metric: testMSE, op: "near-min", over: degree, tolerance: { steps: 1, ratio: 1.6 } }
+  hint: 盯着下面的“测试误差”数字，来回拖几下，找它最小的地方。
+  explain: 测试误差在这附近最小。曲线没有穿过每个蓝点，却离橙圈最近。
+- id: q3
+  type: choice
+  prompt: 一个模型训练误差很低，测试误差却很高。它最可能是……
+  options: [欠拟合, 过拟合, 拟合得刚刚好]
+  answer: 1
+  hint: 训练时表现好、考试时表现差，像哪种学生？
+  explain: 它把训练数据背下来了，换成新数据就不行。
+- id: q4
+  type: choice
+  prompt: 数学题：平面上有 10 个横坐标各不相同的点，最低几次的多项式一定能穿过全部 10 个点？
+  options: [5 次, 9 次, 10 次]
+  answer: 1
+  hint: n 次多项式有 n + 1 个待定系数。
+  explain: 9 次多项式有 10 个系数，正好解 10 个方程。这也是第 1 题里曲线能穿过所有点的原因。

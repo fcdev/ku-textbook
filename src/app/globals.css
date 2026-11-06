@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/*
+ * 主题 token。色值暂用样机（ku-demo.html）的配色，等 Claude Design 出 token 后整体替换这一段。
+ * 语义固定：train / test / model / truth / good / bad（SPEC §5.3、DESIGN §4）。
+ */
+@theme static {
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-ink: #1a2130;
+  --color-muted: #5b6476;
+  --color-line: #dde2ea;
+  --color-grid: #edf0f5;
+  --color-accent: #3346c9;
+  --color-accent-soft: #e7eafb;
+  --color-model: var(--color-accent);
+  --color-train: #1f6fd1;
+  --color-test: #df7417;
+  --color-truth: #9aa3b3;
+  --color-good: #1c8f4e;
+  --color-good-soft: #e2f4ea;
+  --color-bad: #cf3434;
+  --color-bad-soft: #fbe7e7;
+  --font-display: "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", serif;
+  --font-sans: "PingFang SC", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --radius-ku: 10px;
+}
+
+:root { color-scheme: light; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #11141a; --color-surface: #191e26; --color-ink: #e5e8ee; --color-muted: #9aa3b3;
+    --color-line: #2b323d; --color-grid: #1f252e; --color-accent: #8a99ff; --color-accent-soft: #252b4a;
+    --color-train: #5ea4f2; --color-test: #f3a052; --color-truth: #6b7486;
+    --color-good: #3fcb7c; --color-good-soft: #163323; --color-bad: #ff6e6e; --color-bad-soft: #3a1c1e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --color-bg: #11141a; --color-surface: #191e26; --color-ink: #e5e8ee; --color-muted: #9aa3b3;
+  --color-line: #2b323d; --color-grid: #1f252e; --color-accent: #8a99ff; --color-accent-soft: #252b4a;
+  --color-train: #5ea4f2; --color-test: #f3a052; --color-truth: #6b7486;
+  --color-good: #3fcb7c; --color-good-soft: #163323; --color-bad: #ff6e6e; --color-bad-soft: #3a1c1e;
+  color-scheme: dark;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.75;
+}
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.3; }
+.mono, .tabular { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+@layer base { a { color: var(--color-accent); } }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+/* ---------- 实验图 ---------- */
+.plot { display: block; width: 100%; height: auto; touch-action: pan-y; }
+.plot text { fill: var(--color-muted); font-family: var(--font-mono); font-size: 13px; }
+@media (max-width: 640px) { .plot text { font-size: 18px; } }
+.plot .gridline { stroke: var(--color-grid); stroke-width: 1; }
+.plot .axis { stroke: var(--color-line); stroke-width: 1.2; }
+.plot .model { fill: none; stroke: var(--color-model); stroke-width: 3; stroke-linejoin: round; }
+.plot .truth { fill: none; stroke: var(--color-truth); stroke-width: 2; stroke-dasharray: 6 5; }
+.plot .pt-train { fill: var(--color-train); stroke: var(--color-surface); stroke-width: 1.5; }
+.plot .pt-test { fill: var(--color-surface); stroke: var(--color-test); stroke-width: 2; }
+.plot .ln-train { fill: none; stroke: var(--color-train); stroke-width: 2; }
+.plot .ln-test { fill: none; stroke: var(--color-test); stroke-width: 2; }
+.plot .dot-train { fill: var(--color-train); }
+.plot .dot-test { fill: var(--color-surface); stroke: var(--color-test); stroke-width: 2; }
+.plot .cursor { stroke: var(--color-model); stroke-width: 1.5; stroke-dasharray: 3 3; }
+
+/* ---------- 滑块 ---------- */
+.slider { display: grid; grid-template-columns: 5.5em 1fr 3.5em; align-items: center; gap: 12px; min-height: 44px; }
+.slider input[type="range"] { width: 100%; height: 44px; background: transparent; accent-color: var(--color-model); cursor: pointer; margin: 0; }
+.slider input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 3px; background: var(--color-line); }
+.slider input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; margin-top: -11px; border-radius: 50%; background: var(--color-model); border: 3px solid var(--color-surface); box-shadow: 0 0 0 1px var(--color-model); }
+.slider input[type="range"]::-moz-range-track { height: 6px; border-radius: 3px; background: var(--color-line); }
+.slider input[type="range"]::-moz-range-thumb { width: 24px; height: 24px; border-radius: 50%; background: var(--color-model); border: 3px solid var(--color-surface); }
+.slider input[type="range"]:disabled { cursor: not-allowed; opacity: .55; }
+.slider output { text-align: right; }
+
+/* ---------- 文章 ---------- */
+.ku-prose > * + * { margin-top: 1rem; }
+.ku-prose h2 { font-size: 1.5rem; font-weight: 700; margin-top: 0.25rem; }
+.ku-prose strong { font-weight: 700; }
+.ku-prose .katex-display { margin: 0; overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+@media (min-width: 1024px) {
+  /* 桌面：正文左栏，实验在右栏粘住；手机：实验在正文中间 */
+  .ku-level { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 520px); column-gap: 40px; align-items: start; }
+  .ku-level > * { grid-column: 1; }
+  .ku-level > * + * { margin-top: 1rem; }
+  .ku-level > .exp-block { grid-column: 2; grid-row: 1 / span 40; position: sticky; top: 72px; margin-top: 0; }
+}
+.ku-switch[data-level="intuition"] [data-section="theory"],
+.ku-switch[data-level="theory"] [data-section="intuition"] { display: none; }

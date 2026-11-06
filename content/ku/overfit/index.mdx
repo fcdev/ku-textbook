@@ -1,0 +1,59 @@
+---
+id: overfit
+title: 过拟合与欠拟合
+summary: 模型把训练数据背下来，换成新数据就不行。
+prerequisites: [lsq, split]
+chapter: 8
+experiment: poly-fit
+links:
+  math: [多项式函数, 待定系数法]
+  physics: [实验数据处理]
+reading:
+  - { title: "Understanding Deep Learning 第 8 章", url: "https://udlbook.github.io/udlbook/" }
+status: published
+authors: [c]
+reviewers: []
+estMinutes: 8
+---
+
+<Intuition>
+
+## 背答案的学生
+
+一个学生把练习册的答案全背了下来。练习册上的题他全对，可一换成没见过的新题，他就不会了。模型也会犯同样的错，这叫**过拟合**。
+
+图里的<Train>蓝点</Train>是模型学习时看到的数据，<Test>橙圈</Test>是它从没见过的新数据。模型要做的，是找一条曲线去“解释”这些点。
+
+<Experiment id="poly-fit" preset="article" />
+
+拖动滑块，改变曲线能有多弯，也就是多项式的**阶数**：
+
+<Stage label="1–2 阶">曲线太直，连蓝点都对不上。这是**欠拟合**，像没复习的学生。</Stage>
+
+<Stage label="3–5 阶">曲线大致跟着点走，橙圈也离得不远。这是我们想要的。</Stage>
+
+<Stage label="9 阶以上">曲线穿过了每一个蓝点，却在点和点之间乱跳，离橙圈越来越远。这就是背答案。</Stage>
+
+<Callout>判断模型好不好，要看它在**没见过的数据**上表现如何，而不是在练习题上。所以我们总要留一部分数据不给模型看，专门用来考它。</Callout>
+
+</Intuition>
+
+<Theory>
+
+## 训练误差和测试误差
+
+模型是一个 $d$ 阶多项式，用最小二乘法在 $N$ 个训练点上求系数 $w$：
+
+<Formula>f(x) = w_0 + w_1 x + w_2 x^2 + \cdots + w_d x^d</Formula>
+
+<Formula>L(w) = \frac{1}{N}\sum_{i=1}^{N} \bigl( f(x_i) - y_i \bigr)^2</Formula>
+
+<Experiment id="poly-fit" preset="article" sweep />
+
+阶数 $d$ 越高，模型能表示的函数越多，训练误差只会下降或不变。当 $d \ge N - 1$ 时，总能找到一条曲线穿过所有训练点，训练误差降到 0。
+
+测试误差不一样。它先随 $d$ 下降，到某个位置后开始上升，画出来是一个 U 形，就是实验下方那张图。
+
+U 形左侧误差大，是因为模型太简单，系统性地偏离真实规律（**偏差**大）。右侧误差大，是因为模型把训练数据里的噪声也学了进去，换一批数据结果就大不相同（**方差**大）。下一个知识点“偏差与方差”会展开讲。
+
+</Theory>

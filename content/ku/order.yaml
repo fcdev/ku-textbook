@@ -1,0 +1,23 @@
+# 知识地图里同层节点的默认顺序（SPEC §9 的表格顺序）
+- supervised
+- linreg
+- split
+- loss
+- relu
+- lsq
+- gd
+- xent
+- shallow
+- overfit
+- lr
+- sgd
+- uat
+- deep
+- biasvar
+- l2
+- early
+- adam
+- backprop
+- init
+- ddescent
+- dropout

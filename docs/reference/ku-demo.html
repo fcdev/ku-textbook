@@ -1,0 +1,598 @@
+<title>KU 学法样机</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: lab-notebook page. One KU ("过拟合") header, a tab strip of five delivery formats, each tab = format note + working view. Plots sit on faint graph paper. */
+:root{
+  --bg:#f5f7fa; --surface:#ffffff; --ink:#1a2130; --muted:#5b6476; --line:#dde2ea; --grid:#edf0f5;
+  --accent:#3346c9; --accent-soft:#e7eafb;
+  --train:#1f6fd1; --test:#df7417; --truth:#9aa3b3;
+  --good:#1c8f4e; --good-soft:#e2f4ea; --bad:#cf3434; --bad-soft:#fbe7e7;
+  --f-display:"Noto Serif SC","Songti SC",serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11141a; --surface:#191e26; --ink:#e5e8ee; --muted:#9aa3b3; --line:#2b323d; --grid:#1f252e;
+  --accent:#8a99ff; --accent-soft:#252b4a;
+  --train:#5ea4f2; --test:#f3a052; --truth:#6b7486;
+  --good:#3fcb7c; --good-soft:#163323; --bad:#ff6e6e; --bad-soft:#3a1c1e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11141a; --surface:#191e26; --ink:#e5e8ee; --muted:#9aa3b3; --line:#2b323d; --grid:#1f252e;
+  --accent:#8a99ff; --accent-soft:#252b4a;
+  --train:#5ea4f2; --test:#f3a052; --truth:#6b7486;
+  --good:#3fcb7c; --good-soft:#163323; --bad:#ff6e6e; --bad-soft:#3a1c1e; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.3}
+h1{font-size:clamp(24px,4vw,32px)}
+h2{font-size:20px}
+h3{font-size:16px}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--muted)}
+.muted{color:var(--muted)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* header */
+.head{display:flex;flex-direction:column;gap:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:2px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted)}
+.chip b{color:var(--ink);font-weight:500}
+.banner{font-size:13px;color:var(--muted);border-left:3px solid var(--accent);padding:2px 0 2px 10px}
+
+/* tabs */
+.tabs{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
+.tab{appearance:none;border:0;background:none;padding:10px 14px;cursor:pointer;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;font-weight:500}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab small{display:block;font-size:11px;font-weight:400;color:var(--muted)}
+
+/* format note */
+.fmt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.fmt div{background:var(--surface);padding:10px 14px;min-width:0}
+.fmt span{display:block;font-size:12px;color:var(--muted)}
+@media (max-width:640px){.fmt{grid-template-columns:1fr}}
+
+.panel{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+
+/* plots */
+svg.plot{width:100%;height:auto;display:block;background:var(--surface)}
+.plot .gridline{stroke:var(--grid);stroke-width:1}
+.plot .axis{stroke:var(--line);stroke-width:1.2}
+.plot .truth{fill:none;stroke:var(--truth);stroke-width:1.5;stroke-dasharray:5 5}
+.plot .fit{fill:none;stroke:var(--accent);stroke-width:2.6}
+.plot .pt-train{fill:var(--train);stroke:var(--surface);stroke-width:1.5}
+.plot .pt-test{fill:var(--surface);stroke:var(--test);stroke-width:2}
+.plot text{fill:var(--muted);font-size:11px;font-family:var(--f-mono)}
+.plot .ln-train{fill:none;stroke:var(--train);stroke-width:2}
+.plot .ln-test{fill:none;stroke:var(--test);stroke-width:2}
+.plot .cur{stroke:var(--accent);stroke-width:1.5;stroke-dasharray:3 3}
+.plot .dot-train{fill:var(--train)} .plot .dot-test{fill:var(--test)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.lg-train{background:var(--train)} .lg-test{border:2px solid var(--test);background:var(--surface)}
+.lg-fit{border-radius:0!important;height:3px!important;width:16px!important;background:var(--accent);vertical-align:3px!important}
+.lg-truth{border-radius:0!important;height:0!important;width:16px!important;border-top:2px dashed var(--truth);vertical-align:3px!important}
+
+.ctrl{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:10px}
+.ctrl label{font-size:13px;color:var(--muted);white-space:nowrap}
+.ctrl output{font-family:var(--f-mono);font-size:13px;min-width:4.5em;text-align:right}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.readout{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px}
+.readout b{font-family:var(--f-mono);font-weight:600}
+.readout .tr b{color:var(--train)} .readout .te b{color:var(--test)}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);padding:7px 14px;border-radius:8px;cursor:pointer;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:600}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{appearance:none;border:0;background:var(--surface);padding:5px 12px;cursor:pointer;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+
+/* article */
+.article{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:start}
+.article .text{display:flex;flex-direction:column;gap:14px;max-width:62ch}
+.article .stick{position:sticky;top:12px;display:flex;flex-direction:column;gap:10px}
+.callout{background:var(--accent-soft);border-radius:8px;padding:10px 14px;font-size:14px}
+.formula{font-family:var(--f-mono);font-size:14px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 14px;overflow-x:auto;white-space:nowrap}
+.stage{display:flex;gap:8px;align-items:baseline}
+.stage b{font-family:var(--f-mono);color:var(--accent);min-width:3.5em}
+@media (max-width:820px){.article{grid-template-columns:1fr}.article .stick{position:static;order:-1}}
+
+/* practice */
+.prac{max-width:640px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.prog{display:flex;align-items:center;gap:12px}
+.bar{flex:1;height:10px;background:var(--grid);border-radius:999px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--good);border-radius:999px;transition:width .3s}
+.xp{font-family:var(--f-mono);font-size:13px;color:var(--good);font-weight:600}
+.q{font-family:var(--f-display);font-size:19px;line-height:1.45}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{appearance:none;text-align:left;border:2px solid var(--line);border-bottom-width:4px;background:var(--surface);border-radius:12px;padding:12px 16px;cursor:pointer;font-size:15px}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt:disabled{cursor:default}
+.fb{border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.fb.ok{background:var(--good-soft);color:var(--good)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.fb p{color:var(--ink);font-size:14px}
+.fb strong{font-size:16px}
+.check{appearance:none;border:0;border-radius:12px;padding:12px;font-weight:700;font-size:16px;cursor:pointer;background:var(--good);color:var(--surface)}
+.check:disabled{background:var(--grid);color:var(--muted);cursor:default}
+.fb.no .check{background:var(--bad)}
+.done{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;padding:24px 0}
+.done .big{font-family:var(--f-mono);font-size:40px;color:var(--good);font-weight:600}
+
+/* lab */
+.lab{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+.lab .side{display:flex;flex-direction:column;gap:12px}
+@media (max-width:820px){.lab{grid-template-columns:1fr}}
+
+/* map */
+.maptools{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.search{flex:1;min-width:200px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 12px}
+.mapbox{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+svg.map{display:block;min-width:1120px;width:100%;height:auto}
+.map .edge{fill:none;stroke:var(--line);stroke-width:1.4}
+.map .edge.on{stroke:var(--accent);stroke-width:2}
+.map .node rect{fill:var(--surface);stroke:var(--muted);stroke-width:1.2}
+.map .node.later rect{stroke-dasharray:4 3;stroke:var(--truth)}
+.map .node text{fill:var(--ink);font-size:13px;font-family:var(--f-body)}
+.map .node .ch{fill:var(--muted);font-size:10px;font-family:var(--f-mono)}
+.map .node{cursor:pointer}
+.map .node.dim{opacity:.28}
+.map .node.hit rect{stroke:var(--test);stroke-width:2.4}
+.map .node.onpath rect{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.8}
+.map .node.target rect{fill:var(--accent);stroke:var(--accent)}
+.map .node.target text{fill:var(--surface)}
+.map .badge{fill:var(--accent)} .map .badge-t{fill:var(--surface);font-size:10px;font-family:var(--f-mono);font-weight:600}
+.pathlist{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:14px}
+.pathlist .step{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 12px}
+.pathlist .step.t{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.pathlist .arr{color:var(--muted)}
+.maplegend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--muted)}
+.maplegend span::before{content:"";display:inline-block;width:18px;height:11px;margin-right:6px;vertical-align:-1px;border:1.5px solid var(--muted);border-radius:3px}
+.maplegend .l-later::before{border-style:dashed;border-color:var(--truth)}
+.maplegend .l-path::before{background:var(--accent-soft);border-color:var(--accent)}
+.maplegend .l-target::before{background:var(--accent);border-color:var(--accent)}
+
+/* teacher */
+.teach{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);gap:16px;align-items:start}
+@media (max-width:820px){.teach{grid-template-columns:1fr}}
+.kulist{display:flex;flex-direction:column;gap:2px;max-height:420px;overflow-y:auto}
+.kulist label{display:flex;gap:8px;align-items:center;font-size:14px;padding:4px 6px;border-radius:6px;cursor:pointer}
+.kulist label:hover{background:var(--bg)}
+.kulist .chn{font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-left:auto}
+.form{display:flex;flex-direction:column;gap:10px}
+.form .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.form .row > span{color:var(--muted);min-width:4em}
+.course{display:flex;flex-direction:column;gap:6px;counter-reset:c}
+.course li{list-style:none;display:flex;gap:10px;align-items:center;font-size:14px;padding:6px 10px;border:1px solid var(--line);border-radius:8px}
+.course li::before{counter-increment:c;content:counter(c);font-family:var(--f-mono);font-size:12px;color:var(--muted);min-width:1.2em}
+.course li.learned{opacity:.5;text-decoration:line-through}
+.course .tag{font-size:11px;padding:1px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.course .learn{margin-left:auto;font-size:12px;color:var(--muted);display:flex;gap:4px;align-items:center}
+ol.course{padding:0;margin:0}
+.plan{display:flex;flex-direction:column;gap:14px}
+.plan h3{font-size:15px}
+.plan ul{margin:0;padding-left:20px}
+.timeline{display:flex;flex-direction:column;gap:0;border-left:2px solid var(--line);margin-left:6px}
+.timeline div{position:relative;padding:4px 0 10px 18px;font-size:14px}
+.timeline div::before{content:"";position:absolute;left:-6px;top:11px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--accent)}
+.timeline b{font-family:var(--f-mono);font-weight:600;color:var(--accent);margin-right:8px}
+.note{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="head">
+    <span class="eyebrow">KNOWLEDGE UNIT · 样机</span>
+    <h1>过拟合与欠拟合</h1>
+    <div class="chips">
+      <span class="chip">前置 <b>最小二乘与均方误差</b> · <b>训练集与测试集</b></span>
+      <span class="chip">数学 <b>多项式函数</b></span>
+      <span class="chip">延伸阅读 <b>UDL 第 8 章</b></span>
+    </div>
+    <p class="banner">同一个知识点、同一个实验组件，换五种学法。只有“过拟合”这个 KU 是可交互的，其余 KU 在知识地图和备课页里只显示位置。</p>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-tab="map">知识地图<small>Wikipedia / AMiner</small></button>
+    <button class="tab" role="tab" data-tab="article">互动文章<small>Distill / 3Blue1Brown</small></button>
+    <button class="tab" role="tab" data-tab="practice">闯关练习<small>多邻国</small></button>
+    <button class="tab" role="tab" data-tab="lab">实验沙盒<small>TensorFlow Playground</small></button>
+    <button class="tab" role="tab" data-tab="teacher">教师备课<small>组课 + 教案</small></button>
+  </nav>
+
+  <!-- MAP -->
+  <section class="panel" data-panel="map" hidden>
+    <div class="fmt">
+      <div><span>像什么</span>Wikipedia 的词条网络、AMiner 的知识图谱</div>
+      <div><span>适合谁</span>所有人的入口；老师看课程全貌</div>
+      <div><span>开发成本</span>低：图从每个 KU 的“前置”字段自动生成</div>
+    </div>
+    <div class="maptools">
+      <input class="search" id="q" type="search" placeholder="搜索知识点，比如“正则化”或“第 6 章”" aria-label="搜索知识点">
+      <span class="note">点任意一个知识点，看从零学到它的路径</span>
+    </div>
+    <div class="mapbox"><svg class="map" id="map" role="img" aria-label="22 个知识点的前置关系图"></svg></div>
+    <div class="maplegend"><span>第一个月做完整</span><span class="l-later">先上地图，第二批做</span><span class="l-path">学习路径上的前置</span><span class="l-target">目标</span></div>
+    <div class="card"><div class="eyebrow" style="margin-bottom:6px">学习路径</div><div class="pathlist" id="pathlist"></div></div>
+  </section>
+
+  <!-- ARTICLE -->
+  <section class="panel" data-panel="article" hidden>
+    <div class="fmt">
+      <div><span>像什么</span>Distill 的可交互论文、3Blue1Brown 的讲解</div>
+      <div><span>适合谁</span>自学的本科生、Science of AI 爱好者</div>
+      <div><span>开发成本</span>中：每个 KU 要写一篇短文，实验组件复用</div>
+    </div>
+    <div class="article">
+      <div class="text">
+        <div class="seg" role="group" aria-label="内容深度">
+          <button type="button" data-level="intuition" aria-pressed="true">直觉</button>
+          <button type="button" data-level="theory" aria-pressed="false">原理</button>
+        </div>
+        <div data-level-body="intuition" class="text">
+          <h2>背答案的学生</h2>
+          <p>一个学生把练习册的答案全背了下来。练习册上的题他全对，可一换成没见过的新题，他就不会了。模型也会犯同样的错，这叫<b>过拟合</b>。</p>
+          <p>右边这张图里，<span style="color:var(--train)">蓝点</span>是模型学习时看到的数据，<span style="color:var(--test)">橙圈</span>是它从没见过的新数据。模型要做的，是找一条曲线去“解释”这些点。</p>
+          <p>拖动滑块，改变曲线能有多弯，也就是多项式的<b>阶数</b>：</p>
+          <div class="stage"><b>1–2 阶</b><span>曲线太直，连蓝点都对不上。这是<b>欠拟合</b>，像没复习的学生。</span></div>
+          <div class="stage"><b>3–5 阶</b><span>曲线大致跟着点走，橙圈也离得不远。这是我们想要的。</span></div>
+          <div class="stage"><b>9 阶以上</b><span>曲线穿过了每一个蓝点，却在点和点之间乱跳，离橙圈越来越远。这就是背答案。</span></div>
+          <p class="callout">判断模型好不好，要看它在<b>没见过的数据</b>上表现如何，而不是在练习题上。所以我们总要留一部分数据不给模型看，专门用来考它。</p>
+        </div>
+        <div data-level-body="theory" class="text" hidden>
+          <h2>训练误差和测试误差</h2>
+          <p>模型是一个 d 阶多项式，用最小二乘法在 N 个训练点上求系数 w：</p>
+          <div class="formula">f(x) = w<sub>0</sub> + w<sub>1</sub>x + w<sub>2</sub>x<sup>2</sup> + … + w<sub>d</sub>x<sup>d</sup></div>
+          <div class="formula">L(w) = (1/N) Σ<sub>i</sub> ( f(x<sub>i</sub>) − y<sub>i</sub> )<sup>2</sup></div>
+          <p>阶数 d 越高，模型能表示的函数越多，训练误差只会下降或不变。当 d ≥ N − 1 时，总能找到一条曲线穿过所有训练点，训练误差降到 0。</p>
+          <p>测试误差不一样。它先随 d 下降，到某个位置后开始上升，画出来是一个 U 形。右下角的图就是这条 U 形曲线。</p>
+          <p>U 形左侧误差大，是因为模型太简单，系统性地偏离真实规律（偏差大）。右侧误差大，是因为模型把训练数据里的噪声也学了进去，换一批数据结果就大不相同（方差大）。下一个 KU“偏差与方差”会展开讲。</p>
+          <p class="note">延伸阅读：Simon Prince，《Understanding Deep Learning》第 8 章。</p>
+        </div>
+      </div>
+      <div class="stick">
+        <div class="card" style="padding:10px"><svg class="plot" id="artPlot" viewBox="0 0 600 340" role="img" aria-label="多项式拟合实验"></svg></div>
+        <div class="ctrl"><label for="artDeg">阶数</label><input type="range" id="artDeg" min="0" max="12" value="1"><output id="artDegO" class="mono">1</output></div>
+        <div class="readout"><span class="tr">训练误差 <b id="artTr">–</b></span><span class="te">测试误差 <b id="artTe">–</b></span></div>
+        <div class="card theory-only" style="padding:10px" hidden><svg class="plot" id="artCurve" viewBox="0 0 600 220" role="img" aria-label="误差随阶数变化"></svg></div>
+        <div class="legend"><span><i class="lg-train"></i>训练数据</span><span><i class="lg-test"></i>测试数据</span><span><i class="lg-fit"></i>模型曲线</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section class="panel" data-panel="practice" hidden>
+    <div class="fmt">
+      <div><span>像什么</span>多邻国：一屏一题，对错马上知道</div>
+      <div><span>适合谁</span>高中生、零基础初学者；课堂随堂练习</div>
+      <div><span>开发成本</span>中：每个 KU 出 3–5 题，“调到目标值”类题目直接读实验状态判分</div>
+    </div>
+    <div class="prac" id="prac"></div>
+  </section>
+
+  <!-- LAB -->
+  <section class="panel" data-panel="lab" hidden>
+    <div class="fmt">
+      <div><span>像什么</span>TensorFlow Playground、PhET 仿真</div>
+      <div><span>适合谁</span>爱好者自由探索；老师课堂投屏演示</div>
+      <div><span>开发成本</span>低：就是实验组件本身，把参数全放出来</div>
+    </div>
+    <div class="lab">
+      <div class="panel" style="gap:10px">
+        <div class="card" style="padding:10px"><svg class="plot" id="labPlot" viewBox="0 0 600 340" role="img" aria-label="多项式拟合沙盒"></svg></div>
+        <div class="legend"><span><i class="lg-train"></i>训练数据</span><span><i class="lg-test"></i>测试数据</span><span><i class="lg-fit"></i>模型曲线</span><span><i class="lg-truth"></i>真实规律</span></div>
+      </div>
+      <div class="side">
+        <div class="card side">
+          <div class="ctrl"><label for="labDeg">阶数</label><input type="range" id="labDeg" min="0" max="12" value="4"><output id="labDegO" class="mono"></output></div>
+          <div class="ctrl"><label for="labN">训练点数</label><input type="range" id="labN" min="5" max="40" value="12"><output id="labNO" class="mono"></output></div>
+          <div class="ctrl"><label for="labNoise">噪声</label><input type="range" id="labNoise" min="0" max="50" value="20"><output id="labNoiseO" class="mono"></output></div>
+          <div class="ctrl"><label for="labLam">正则化 λ</label><input type="range" id="labLam" min="0" max="6" value="0"><output id="labLamO" class="mono"></output></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" id="labResample" type="button">重新采样数据</button>
+            <button class="btn" id="labTruth" type="button" aria-pressed="true">隐藏真实规律</button>
+          </div>
+          <div class="readout"><span class="tr">训练误差 <b id="labTr">–</b></span><span class="te">测试误差 <b id="labTe">–</b></span></div>
+        </div>
+        <div class="card" style="padding:10px">
+          <div class="eyebrow" style="padding:0 6px">误差随阶数变化（对数坐标）</div>
+          <svg class="plot" id="labCurve" viewBox="0 0 600 240" role="img" aria-label="训练和测试误差随阶数变化"></svg>
+        </div>
+        <p class="note">试试：把阶数调到 10，再把训练点数加到 40，或者把 λ 调大。两种办法都能压住过拟合，对应后面的“更多数据”和“L2 正则化”两个 KU。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEACHER -->
+  <section class="panel" data-panel="teacher" hidden>
+    <div class="fmt">
+      <div><span>像什么</span>课件库 + 教案生成</div>
+      <div><span>适合谁</span>没有 AI 背景的任课老师（付费方）</div>
+      <div><span>开发成本</span>中：组课靠前置关系自动算；教案由大模型按模板生成</div>
+    </div>
+    <div class="teach">
+      <div class="card form">
+        <h3>1. 选这节课要讲的知识点</h3>
+        <div class="kulist" id="kulist"></div>
+      </div>
+      <div class="panel">
+        <div class="card form">
+          <h3>2. 课程顺序（自动补齐前置）</h3>
+          <ol class="course" id="course"></ol>
+          <p class="note">学生已经学过的，勾“已学”就会从教案里跳过。</p>
+          <div class="row"><span>学段</span><div class="seg" id="stage"><button type="button" data-v="高中" aria-pressed="true">高中</button><button type="button" data-v="本科" aria-pressed="false">本科低年级</button></div></div>
+          <div class="row"><span>课时</span><div class="seg" id="periods"><button type="button" data-v="1" aria-pressed="true">1 × 45 分钟</button><button type="button" data-v="2" aria-pressed="false">2 × 45 分钟</button></div></div>
+          <div class="row"><span>融合学科</span><div class="seg" id="subject"><button type="button" data-v="数学" aria-pressed="true">数学</button><button type="button" data-v="物理" aria-pressed="false">物理</button><button type="button" data-v="无" aria-pressed="false">不融合</button></div></div>
+        </div>
+        <div class="card plan" id="plan"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- math ---------- */
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){var u=1-r(),v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function truth(x){return 0.85*Math.sin(2.7*x)+0.25*x;}
+function makeData(n,noise,seed){var r=rng(seed),xs=[],ys=[];for(var i=0;i<n;i++){xs.push(-1+2*r());}xs.sort(function(a,b){return a-b;});for(i=0;i<n;i++){ys.push(truth(xs[i])+noise*gauss(r));}return{xs:xs,ys:ys};}
+function fit(xs,ys,d,lam){
+  var m=d+1,A=[],b=[],i,j,k;
+  for(i=0;i<m;i++){A.push(new Array(m).fill(0));b.push(0);}
+  for(k=0;k<xs.length;k++){var p=[1];for(i=1;i<m;i++)p.push(p[i-1]*xs[k]);
+    for(i=0;i<m;i++){b[i]+=p[i]*ys[k];for(j=0;j<m;j++)A[i][j]+=p[i]*p[j];}}
+  var reg=Math.max(lam,1e-10)*Math.max(1,xs.length);
+  for(i=1;i<m;i++)A[i][i]+=reg; A[0][0]+=1e-12;
+  for(i=0;i<m;i++){var piv=i;for(j=i+1;j<m;j++)if(Math.abs(A[j][i])>Math.abs(A[piv][i]))piv=j;
+    var t=A[i];A[i]=A[piv];A[piv]=t;t=b[i];b[i]=b[piv];b[piv]=t;
+    for(j=i+1;j<m;j++){var f=A[j][i]/A[i][i];for(k=i;k<m;k++)A[j][k]-=f*A[i][k];b[j]-=f*b[i];}}
+  var w=new Array(m).fill(0);
+  for(i=m-1;i>=0;i--){var s=b[i];for(j=i+1;j<m;j++)s-=A[i][j]*w[j];w[i]=s/A[i][i];}
+  return w;}
+function ev(w,x){var s=0;for(var i=w.length-1;i>=0;i--)s=s*x+w[i];return s;}
+function mse(w,xs,ys){var s=0;for(var i=0;i<xs.length;i++){var e=ev(w,xs[i])-ys[i];s+=e*e;}return s/xs.length;}
+function fmt(v){if(!isFinite(v))return "∞";if(v>=100)return v.toExponential(1);if(v>=1)return v.toFixed(2);return v.toFixed(3);}
+
+/* ---------- experiment model ---------- */
+function Experiment(o){this.deg=o.deg;this.n=o.n;this.noise=o.noise;this.lam=o.lam||0;this.seed=o.seed;this.resample();}
+Experiment.prototype.resample=function(){this.train=makeData(this.n,this.noise,this.seed);this.test=makeData(40,this.noise,this.seed+1000);this.recalc();};
+Experiment.prototype.recalc=function(){this.w=fit(this.train.xs,this.train.ys,this.deg,this.lam);this.trErr=mse(this.w,this.train.xs,this.train.ys);this.teErr=mse(this.w,this.test.xs,this.test.ys);};
+Experiment.prototype.sweep=function(){var out=[];for(var d=0;d<=12;d++){var w=fit(this.train.xs,this.train.ys,d,this.lam);out.push({d:d,tr:mse(w,this.train.xs,this.train.ys),te:mse(w,this.test.xs,this.test.ys)});}return out;};
+
+/* ---------- drawing ---------- */
+var NS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function drawPlot(svg,ex,opt){
+  opt=opt||{};svg.innerHTML="";
+  var W=600,H=340,pl=34,pr=10,pt=10,pb=24,X0=-1.05,X1=1.05,Y0=-1.9,Y1=1.9;
+  function sx(x){return pl+(x-X0)/(X1-X0)*(W-pl-pr);} function sy(y){return pt+(Y1-y)/(Y1-Y0)*(H-pt-pb);}
+  var id="clip"+svg.id;var defs=el("defs",{},svg);var cp=el("clipPath",{id:id},defs);el("rect",{x:pl,y:pt,width:W-pl-pr,height:H-pt-pb},cp);
+  var x,y;
+  for(x=-1;x<=1.001;x+=0.5){el("line",{class:"gridline",x1:sx(x),x2:sx(x),y1:pt,y2:H-pb},svg);var t=el("text",{x:sx(x),y:H-6,"text-anchor":"middle"},svg);t.textContent=x.toFixed(1);}
+  for(y=-1.5;y<=1.501;y+=0.5){el("line",{class:y===0?"axis":"gridline",x1:pl,x2:W-pr,y1:sy(y),y2:sy(y)},svg);var t2=el("text",{x:pl-6,y:sy(y)+4,"text-anchor":"end"},svg);t2.textContent=y.toFixed(1);}
+  var g=el("g",{"clip-path":"url(#"+id+")"},svg);
+  function path(f){var d="";for(var i=0;i<=240;i++){var xx=X0+(X1-X0)*i/240,yy=f(xx);yy=Math.max(Y0-5,Math.min(Y1+5,yy));d+=(i?"L":"M")+sx(xx).toFixed(1)+" "+sy(yy).toFixed(1);}return d;}
+  if(opt.truth)el("path",{class:"truth",d:path(truth)},g);
+  el("path",{class:"fit",d:path(function(v){return ev(ex.w,v);})},g);
+  if(opt.test!==false)for(var i=0;i<ex.test.xs.length;i++)el("circle",{class:"pt-test",cx:sx(ex.test.xs[i]),cy:sy(ex.test.ys[i]),r:4},g);
+  for(i=0;i<ex.train.xs.length;i++)el("circle",{class:"pt-train",cx:sx(ex.train.xs[i]),cy:sy(ex.train.ys[i]),r:5.5},g);
+}
+function drawCurve(svg,ex,H){
+  svg.innerHTML="";H=H||240;
+  var W=600,pl=46,pr=70,pt=12,pb=26,data=ex.sweep(),L0=-3,L1=2;
+  function sx(d){return pl+d/12*(W-pl-pr);} function sy(v){var l=Math.log10(Math.max(v,1e-3));l=Math.min(L1,Math.max(L0,l));return pt+(L1-l)/(L1-L0)*(H-pt-pb);}
+  for(var l=L0;l<=L1;l++){el("line",{class:"gridline",x1:pl,x2:W-pr,y1:sy(Math.pow(10,l)),y2:sy(Math.pow(10,l))},svg);var t=el("text",{x:pl-6,y:sy(Math.pow(10,l))+4,"text-anchor":"end"},svg);t.textContent=l===0?"1":"10^"+l;}
+  for(var d=0;d<=12;d+=2){var tt=el("text",{x:sx(d),y:H-8,"text-anchor":"middle"},svg);tt.textContent=d;}
+  var tl=el("text",{x:W-pr,y:H-8,"text-anchor":"start"},svg);tl.textContent=" 阶数";
+  el("line",{class:"cur",x1:sx(ex.deg),x2:sx(ex.deg),y1:pt,y2:H-pb},svg);
+  ["tr","te"].forEach(function(k){var dd="";data.forEach(function(p,i){dd+=(i?"L":"M")+sx(p.d).toFixed(1)+" "+sy(p[k]).toFixed(1);});el("path",{class:k==="tr"?"ln-train":"ln-test",d:dd},svg);
+    data.forEach(function(p){el("circle",{class:k==="tr"?"dot-train":"dot-test",cx:sx(p.d),cy:sy(p[k]),r:p.d===ex.deg?4.5:2.5},svg);});
+    var last=data[data.length-1];var lab=el("text",{x:W-pr+6,y:sy(last[k])+4},svg);lab.textContent=k==="tr"?"训练":"测试";lab.setAttribute("style","fill:var("+(k==="tr"?"--train":"--test")+")");});
+}
+
+/* ---------- tabs ---------- */
+var TABS=["map","article","practice","lab","teacher"];
+function show(name){if(TABS.indexOf(name)<0)name="map";
+  document.querySelectorAll(".tab").forEach(function(b){b.setAttribute("aria-selected",b.dataset.tab===name?"true":"false");});
+  document.querySelectorAll("[data-panel]").forEach(function(p){p.hidden=p.dataset.panel!==name;});}
+document.getElementById("tabs").addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;location.hash=b.dataset.tab;show(b.dataset.tab);});
+window.addEventListener("hashchange",function(){show(location.hash.slice(1));});
+
+/* ---------- article ---------- */
+var art=new Experiment({deg:1,n:10,noise:0.2,seed:7});
+var artDeg=document.getElementById("artDeg");
+function renderArt(){art.deg=+artDeg.value;art.recalc();document.getElementById("artDegO").textContent=art.deg;
+  document.getElementById("artTr").textContent=fmt(art.trErr);document.getElementById("artTe").textContent=fmt(art.teErr);
+  drawPlot(document.getElementById("artPlot"),art,{});drawCurve(document.getElementById("artCurve"),art,220);}
+artDeg.addEventListener("input",renderArt);
+document.querySelectorAll("[data-level]").forEach(function(b){b.addEventListener("click",function(){var lv=b.dataset.level;
+  document.querySelectorAll("[data-level]").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});
+  document.querySelectorAll("[data-level-body]").forEach(function(x){x.hidden=x.dataset.levelBody!==lv;});
+  document.querySelector(".theory-only").hidden=lv!=="theory";});});
+renderArt();
+
+/* ---------- lab ---------- */
+var LAMS=[0,1e-5,1e-4,1e-3,1e-2,1e-1,1];
+var lab=new Experiment({deg:4,n:12,noise:0.2,seed:21});var showTruth=true;
+function $(id){return document.getElementById(id);}
+function renderLab(){lab.deg=+$("labDeg").value;lab.lam=LAMS[+$("labLam").value];lab.recalc();
+  $("labDegO").textContent=lab.deg;$("labNO").textContent=lab.n;$("labNoiseO").textContent=lab.noise.toFixed(2);
+  $("labLamO").textContent=lab.lam===0?"关":lab.lam.toExponential(0);
+  $("labTr").textContent=fmt(lab.trErr);$("labTe").textContent=fmt(lab.teErr);
+  drawPlot($("labPlot"),lab,{truth:showTruth});drawCurve($("labCurve"),lab,240);}
+["labDeg","labLam"].forEach(function(i){$(i).addEventListener("input",renderLab);});
+$("labN").addEventListener("input",function(){lab.n=+this.value;lab.resample();renderLab();});
+$("labNoise").addEventListener("input",function(){lab.noise=this.value/100;lab.resample();renderLab();});
+$("labResample").addEventListener("click",function(){lab.seed+=1;lab.resample();renderLab();});
+$("labTruth").addEventListener("click",function(){showTruth=!showTruth;this.textContent=showTruth?"隐藏真实规律":"显示真实规律";this.setAttribute("aria-pressed",String(showTruth));renderLab();});
+renderLab();
+
+/* ---------- practice ---------- */
+var pex=new Experiment({deg:1,n:10,noise:0.2,seed:7});
+var best=pex.sweep().reduce(function(a,b){return b.te<a.te?b:a;});
+var STEPS=[
+ {type:"exp",q:"拖动滑块，让曲线穿过所有蓝点。",hint:"阶数越高，曲线能拐的弯越多。10 个点需要几个弯？",
+  ok:function(){return pex.trErr<0.002;},okText:"训练误差几乎是 0，曲线穿过了每个蓝点。但看看橙圈，它们离曲线有多远？"},
+ {type:"exp",q:"现在看橙圈。把阶数调到测试误差最小的位置。",hint:"盯着下面的“测试误差”数字，来回拖几下，找它最小的地方。",
+  ok:function(){return Math.abs(pex.deg-best.d)<=1&&pex.teErr<=best.te*1.6;},okText:"测试误差在这附近最小。曲线没有穿过每个蓝点，却离橙圈最近。"},
+ {type:"mc",q:"一个模型训练误差很低，测试误差却很高。它最可能是……",opts:["欠拟合","过拟合","拟合得刚刚好"],ans:1,
+  okText:"对。它把训练数据背下来了，换成新数据就不行。",hint:"训练时表现好、考试时表现差，像哪种学生？"},
+ {type:"mc",q:"数学题：平面上有 10 个横坐标各不相同的点，最低几次的多项式一定能穿过全部 10 个点？",opts:["5 次","9 次","10 次"],ans:1,
+  okText:"对。9 次多项式有 10 个系数，正好解 10 个方程。这也是第 1 题里曲线能穿过所有点的原因。",hint:"n 次多项式有 n + 1 个待定系数。"}
+];
+var step=0,xp=0,prac=$("prac"),picked=null,state="ask";
+function renderPrac(){
+  var s=STEPS[step];prac.innerHTML="";
+  var prog=document.createElement("div");prog.className="prog";
+  prog.innerHTML='<div class="bar"><i style="width:'+(step/STEPS.length*100)+'%"></i></div><span class="xp">'+xp+' XP</span>';prac.appendChild(prog);
+  if(step>=STEPS.length){var d=document.createElement("div");d.className="done";
+    d.innerHTML='<div class="big">+'+xp+' XP</div><h2>过拟合与欠拟合 · 完成</h2><p class="muted">解锁下一个知识点：偏差与方差、L2 正则化</p><button class="btn" type="button" id="again">再练一次</button>';
+    prac.appendChild(d);$("again").onclick=function(){step=0;xp=0;pex.deg=1;pex.recalc();state="ask";picked=null;renderPrac();};return;}
+  var q=document.createElement("p");q.className="q";q.textContent=s.q;prac.appendChild(q);
+  if(s.type==="exp"){
+    var box=document.createElement("div");box.className="card";box.style.padding="10px";
+    box.innerHTML='<svg class="plot" id="pPlot" viewBox="0 0 600 340" role="img" aria-label="练习用拟合实验"></svg>';prac.appendChild(box);
+    var c=document.createElement("div");c.className="ctrl";c.innerHTML='<label for="pDeg">阶数</label><input type="range" id="pDeg" min="0" max="12" value="'+pex.deg+'"'+(state!=="ask"?" disabled":"")+'><output id="pDegO" class="mono">'+pex.deg+'</output>';prac.appendChild(c);
+    var r=document.createElement("div");r.className="readout";r.innerHTML='<span class="tr">训练误差 <b id="pTr"></b></span><span class="te">测试误差 <b id="pTe"></b></span>';prac.appendChild(r);
+    var upd=function(){pex.recalc();$("pDegO").textContent=pex.deg;$("pTr").textContent=fmt(pex.trErr);$("pTe").textContent=fmt(pex.teErr);drawPlot($("pPlot"),pex,{test:step>0});};
+    $("pDeg").addEventListener("input",function(){pex.deg=+this.value;upd();});upd();
+  } else {
+    var opts=document.createElement("div");opts.className="opts";
+    s.opts.forEach(function(o,i){var b=document.createElement("button");b.type="button";b.className="opt";b.textContent=o;b.setAttribute("aria-pressed",picked===i?"true":"false");b.disabled=state!=="ask";
+      b.onclick=function(){picked=i;renderPrac();};opts.appendChild(b);});prac.appendChild(opts);
+  }
+  var fb=document.createElement("div");
+  if(state==="ask"){var btn=document.createElement("button");btn.className="check";btn.type="button";btn.textContent="检查";btn.disabled=s.type==="mc"&&picked===null;
+    btn.onclick=function(){var right=s.type==="mc"?picked===s.ans:s.ok();state=right?"right":"wrong";if(right)xp+=10;renderPrac();};fb.appendChild(btn);}
+  else{fb.className="fb "+(state==="right"?"ok":"no");
+    fb.innerHTML='<strong>'+(state==="right"?"答对了！+10 XP":"还差一点")+'</strong><p>'+(state==="right"?s.okText:"提示："+s.hint)+'</p>';
+    var nb=document.createElement("button");nb.className="check";nb.type="button";nb.textContent=state==="right"?"继续":"再试一次";
+    nb.onclick=function(){if(state==="right"){step++;picked=null;}state="ask";renderPrac();};fb.appendChild(nb);}
+  prac.appendChild(fb);
+}
+renderPrac();
+
+/* ---------- knowledge map ---------- */
+var KUS=[
+ {id:"supervised",t:"什么是监督学习",ch:2,pre:[]},
+ {id:"linreg",t:"一元线性回归",ch:2,pre:["supervised"],full:1},
+ {id:"split",t:"训练集与测试集",ch:8,pre:["supervised"]},
+ {id:"loss",t:"损失函数",ch:2,pre:["linreg"],full:1},
+ {id:"relu",t:"激活函数 ReLU",ch:3,pre:["linreg"]},
+ {id:"lsq",t:"最小二乘与均方误差",ch:5,pre:["loss"]},
+ {id:"gd",t:"梯度下降",ch:6,pre:["loss"],full:1},
+ {id:"xent",t:"分类与交叉熵",ch:5,pre:["loss"]},
+ {id:"shallow",t:"浅层神经网络",ch:3,pre:["relu"]},
+ {id:"overfit",t:"过拟合与欠拟合",ch:8,pre:["lsq","split"],full:1},
+ {id:"lr",t:"学习率",ch:6,pre:["gd"],full:1},
+ {id:"sgd",t:"随机梯度下降",ch:6,pre:["gd"]},
+ {id:"uat",t:"万能逼近定理",ch:3,pre:["shallow"]},
+ {id:"deep",t:"深层网络",ch:4,pre:["shallow"]},
+ {id:"biasvar",t:"偏差与方差",ch:8,pre:["overfit"]},
+ {id:"l2",t:"L2 正则化",ch:9,pre:["overfit"],full:1},
+ {id:"early",t:"提前停止",ch:9,pre:["overfit","gd"]},
+ {id:"adam",t:"动量与 Adam",ch:6,pre:["sgd"]},
+ {id:"backprop",t:"反向传播",ch:7,pre:["gd","deep"]},
+ {id:"init",t:"参数初始化",ch:7,pre:["backprop"]},
+ {id:"ddescent",t:"双下降",ch:8,pre:["biasvar","deep"]},
+ {id:"dropout",t:"Dropout",ch:9,pre:["l2","deep"]}
+];
+var BY={};KUS.forEach(function(k,i){k.i=i;BY[k.id]=k;});
+function layer(k){if(k.L!=null)return k.L;k.L=k.pre.length?1+Math.max.apply(null,k.pre.map(function(p){return layer(BY[p]);})):0;return k.L;}
+KUS.forEach(layer);
+var cols=[];KUS.forEach(function(k){(cols[k.L]=cols[k.L]||[]).push(k);});
+cols.forEach(function(c,ci){if(ci>0)c.sort(function(a,b){function bc(k){return k.pre.reduce(function(s,p){return s+BY[p].row;},0)/k.pre.length;}return bc(a)-bc(b);});c.forEach(function(k,ri){k.row=ri;});});
+function closure(ids){var seen={};function go(id){if(seen[id])return;seen[id]=1;BY[id].pre.forEach(go);}ids.forEach(go);
+  return KUS.filter(function(k){return seen[k.id];}).sort(function(a,b){return a.L-b.L||a.i-b.i;});}
+var target="overfit",query="";
+function renderMap(){
+  var svg=$("map");svg.innerHTML="";var NW=144,NH=42,CX=162,RY=62,PX=20,PY=20;
+  var maxRows=Math.max.apply(null,cols.map(function(c){return c.length;}));
+  var W=PX*2+(cols.length-1)*CX+NW,H=PY*2+(maxRows-1)*RY+NH;svg.setAttribute("viewBox","0 0 "+W+" "+H);
+  KUS.forEach(function(k){var off=(maxRows-cols[k.L].length)*RY/2;k.x=PX+k.L*CX;k.y=PY+off+k.row*RY;});
+  var path=closure([target]),on={};path.forEach(function(k){on[k.id]=1;});
+  var q=query.trim().toLowerCase(),hits={};
+  if(q)KUS.forEach(function(k){if(k.t.toLowerCase().indexOf(q)>=0||("第"+k.ch+"章").indexOf(q.replace(/\s/g,""))>=0||k.id.indexOf(q)>=0)hits[k.id]=1;});
+  KUS.forEach(function(k){k.pre.forEach(function(p){var a=BY[p];var x1=a.x+NW,y1=a.y+NH/2,x2=k.x,y2=k.y+NH/2,mx=(x1+x2)/2;
+    el("path",{class:"edge"+(on[k.id]&&on[p]?" on":""),d:"M"+x1+" "+y1+"C"+mx+" "+y1+" "+mx+" "+y2+" "+x2+" "+y2},svg);});});
+  path.forEach(function(k,i){k.order=i+1;});
+  KUS.forEach(function(k){
+    var cls="node"+(k.full?"":" later")+(on[k.id]?(k.id===target?" target":" onpath"):"")+(q?(hits[k.id]?" hit":" dim"):"");
+    var g=el("g",{class:cls,tabindex:"0",role:"button","aria-label":k.t},svg);
+    el("rect",{x:k.x,y:k.y,width:NW,height:NH,rx:8},g);
+    var t=el("text",{x:k.x+10,y:k.y+18},g);t.textContent=k.t;
+    var c=el("text",{class:"ch",x:k.x+10,y:k.y+33},g);c.textContent="UDL 第"+k.ch+"章"+(k.full?"":" · 第二批");
+    if(on[k.id]){el("circle",{class:"badge",cx:k.x+NW-2,cy:k.y+2,r:9},g);var bt=el("text",{class:"badge-t",x:k.x+NW-2,y:k.y+5.5,"text-anchor":"middle"},g);bt.textContent=k.order;}
+    function pick(){target=k.id;renderMap();}
+    g.addEventListener("click",pick);g.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();pick();}});
+  });
+  var pl=$("pathlist");pl.innerHTML="";
+  path.forEach(function(k,i){if(i){var a=document.createElement("span");a.className="arr";a.textContent="→";pl.appendChild(a);}
+    var s=document.createElement("span");s.className="step"+(k.id===target?" t":"");s.textContent=(i+1)+". "+k.t;pl.appendChild(s);});
+  var n=document.createElement("span");n.className="note";n.style.marginLeft="8px";n.textContent="共 "+path.length+" 个知识点，约 "+(path.length*8)+" 分钟";pl.appendChild(n);
+}
+$("q").addEventListener("input",function(){query=this.value;renderMap();});
+$("q").addEventListener("keydown",function(e){if(e.key==="Enter"){var q=this.value.trim();var k=KUS.find(function(k){return q&&k.t.indexOf(q)>=0;});if(k){target=k.id;renderMap();}}});
+renderMap();
+
+/* ---------- teacher ---------- */
+var sel={overfit:1,l2:1},learned={supervised:1},tstage="高中",tper=1,tsub="数学";
+var GOALS={
+ overfit:"能用“背答案”的例子说明什么是过拟合和欠拟合，并能通过训练误差和测试误差判断模型属于哪一种",
+ l2:"知道 L2 正则化通过惩罚过大的系数来抑制过拟合，能在实验里调出合适的 λ",
+ lsq:"会计算均方误差，知道最小二乘是“让误差平方和最小”",
+ split:"说清楚为什么要留出测试集，以及测试集不能参与训练",
+ loss:"理解损失函数衡量“模型错了多少”",
+ linreg:"会用一条直线拟合数据，并解释斜率和截距的含义",
+ supervised:"能区分输入和标签，举出生活中监督学习的例子",
+ gd:"能用“下山”类比说明梯度下降每一步在做什么",
+ lr:"知道学习率太大或太小会发生什么",
+ biasvar:"能用偏差和方差解释测试误差的 U 形曲线"
+};
+var LINK={
+ "数学":{overfit:"多项式函数与待定系数法：n 个点确定一个 n−1 次多项式（实验第 4 题）",l2:"函数的最值与“加约束”的思想",lsq:"平方和、平均数与方差",linreg:"一次函数 y = kx + b",gd:"导数与切线斜率",_:"函数图像的读图与分析"},
+ "物理":{overfit:"实验数据处理：测量有误差，拟合曲线不应穿过每个数据点",l2:"用更简单的模型解释现象（奥卡姆剃刀）",lsq:"测量误差与多次测量取平均",linreg:"用图像法处理实验数据求斜率",gd:"势能曲线上小球沿坡度最陡的方向滚下",_:"实验数据的图像处理"}
+};
+function kulistRender(){var box=$("kulist");box.innerHTML="";
+  KUS.slice().sort(function(a,b){return a.ch-b.ch||a.i-b.i;}).forEach(function(k){var l=document.createElement("label");
+    l.innerHTML='<input type="checkbox" id="ku-'+k.id+'"'+(sel[k.id]?" checked":"")+'><span>'+k.t+'</span><span class="chn">第'+k.ch+'章</span>';
+    l.querySelector("input").addEventListener("change",function(){if(this.checked)sel[k.id]=1;else delete sel[k.id];teachRender();});box.appendChild(l);});}
+function teachRender(){
+  var ids=Object.keys(sel),course=closure(ids),ol=$("course");ol.innerHTML="";
+  course.forEach(function(k){var li=document.createElement("li");if(learned[k.id])li.className="learned";
+    li.innerHTML='<span>'+k.t+'</span>'+(sel[k.id]?'':'<span class="tag">自动补充前置</span>')+'<label class="learn"><input type="checkbox" id="lr-'+k.id+'"'+(learned[k.id]?" checked":"")+'>已学</label>';
+    li.querySelector("input").addEventListener("change",function(){if(this.checked)learned[k.id]=1;else delete learned[k.id];teachRender();});ol.appendChild(li);});
+  var items=course.filter(function(k){return !learned[k.id];});
+  var plan=$("plan"),total=45*tper,intro=5,prac=10,wrap=5,body=total-intro-prac-wrap,per=items.length?Math.floor(body/items.length):0;
+  var h='<div><span class="eyebrow">教案 · 示例</span><h2 style="margin-top:4px">'+(items.length?items.map(function(k){return k.t;}).join("、"):"请先选择知识点")+'</h2><p class="note">'+tstage+' · '+tper+' 课时（'+total+' 分钟）'+(tsub!=="无"?' · 融合'+tsub:'')+'</p></div>';
+  if(items.length){
+    h+='<div><h3>教学目标</h3><ul>'+items.map(function(k){return '<li>'+(GOALS[k.id]||"能说出“"+k.t+"”的含义，并完成配套练习")+'</li>';}).join("")+'</ul></div>';
+    h+='<div><h3>课堂流程</h3><div class="timeline">';
+    h+='<div><b>'+intro+' 分钟</b>导入：'+(tstage==="高中"?"“背答案的学生”的故事，问学生有没有类似经历":"展示一个在训练集上满分、上线后失效的模型案例")+'</div>';
+    items.forEach(function(k){h+='<div><b>'+per+' 分钟</b>'+k.t+'：投屏演示实验，学生用手机打开同一页面动手调参'+(k.full?'':'（该 KU 第二批上线）')+'</div>';});
+    h+='<div><b>'+prac+' 分钟</b>随堂练习：学生完成闯关题，老师看全班正确率</div>';
+    h+='<div><b>'+wrap+' 分钟</b>小结：一句话总结 + 布置作业</div></div></div>';
+    if(tsub!=="无"){h+='<div><h3>和'+tsub+'课的连接</h3><ul>'+items.map(function(k){return '<li><b>'+k.t+'</b>：'+(LINK[tsub][k.id]||LINK[tsub]._)+'</li>';}).join("")+'</ul></div>';}
+    h+='<div><h3>课后作业</h3><ul><li>在实验沙盒里找到测试误差最小的阶数，截图并写一句理由</li><li>举一个生活中“背答案”式过拟合的例子</li></ul></div>';
+  }
+  h+='<p class="note">这是按模板拼出来的示例。正式版由大模型根据所选 KU、学段和学科生成，老师可以直接修改后导出。</p>';
+  plan.innerHTML=h;
+}
+function segBind(id,cb){var g=$(id);g.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;g.querySelectorAll("button").forEach(function(x){x.setAttribute("aria-pressed",x===b?"true":"false");});cb(b.dataset.v);teachRender();});}
+segBind("stage",function(v){tstage=v;});segBind("periods",function(v){tper=+v;});segBind("subject",function(v){tsub=v;});
+kulistRender();teachRender();
+
+show(location.hash.slice(1)||"map");
+})();
+</script>

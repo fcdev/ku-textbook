@@ -1,0 +1,40 @@
+{
+  "name": "ku-textbook",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "pnpm ku:lint && next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "ku:lint": "tsx scripts/ku-lint.ts"
+  },
+  "packageManager": "pnpm@10.28.0",
+  "dependencies": {
+    "flexsearch": "^0.8.212",
+    "gray-matter": "^4.0.3",
+    "katex": "^0.19.1",
+    "next": "^15.5.29",
+    "next-mdx-remote": "^6.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.4",
+    "@types/katex": "^0.16.8",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^4.3.4",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.1.0"
+  },
+  "private": true
+}
