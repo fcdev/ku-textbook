@@ -4,6 +4,8 @@ import KuTabs from "@/components/KuTabs";
 import { getContent, getKu } from "@/lib/content";
 import { t } from "@/lib/strings";
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getContent().kus.map((k) => ({ id: k.id }));
 }
